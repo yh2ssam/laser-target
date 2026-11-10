@@ -1529,6 +1529,7 @@ function processFrame(now){
     if(mode === "red"){ dom = r - (g > b ? g : b); isColor = (dom > redDom && r > 110 && rUp > 25) || isCore; }
     else if(mode === "green"){ dom = g - (r > b ? r : b); isColor = (dom > redDom && g > 110) || isCore; }
     else isColor = isBright;
+    const hot = isBright || isColor;
     const inQuad = !quadMask || quadMask[i];
     if(!warming && adiff > diffT && inQuad && dom > topDom) topDom = dom;
     let a = hot ? BG_ALPHA * SLOW_RATIO : BG_ALPHA;
