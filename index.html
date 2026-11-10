@@ -1363,6 +1363,7 @@ async function startCameraInner(deviceId){
     });
     reconcileResolution();
     setupZoom();
+    try{ await track.applyConstraints({ frameRate:{ ideal:60 } }); }catch(e){}
     setupProcessing();
     await listCameras();
     if(track && track.getSettings && track.getSettings().deviceId){
