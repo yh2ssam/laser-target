@@ -661,7 +661,7 @@ const MIN_AREA = 2, MIN_FILL = 0.42, MAX_ASPECT = 2.6;
 const DEFAULTS = { diff:18, bright:45, red:30, color:"red", maxArea:700 };
 /* 검출 튜닝값 — 현장에서 이 값들로 조정한다 */
 const CFG = {
-  hit:  { confirmFrames:2, strongDom:70, stuckFrames:40, cooldownMs:350 },
+  hit:  { confirmFrames:2, strongDom:70, stuckFrames:40, cooldownMs:350, coreMin:220, coreUp:35 },
   zone: { strongDom:65, minColorPx:2, stuckMs:2500, doubleWindowMs:1800, confirmMidRun:true },
   det:  { deadbandPx:1.5, softMovePx:6 }
 };
@@ -722,7 +722,7 @@ let zoneHot = 0, zoneShape = "", zoneUp = 0, zoneDom = 0, zoneWhy = "";
 let reloadPending = false, reloadPendingAt = 0;
 let lastCleared = null, lastSavedSig = "";
 let dbg = { hot:0, col:0, dom:0 };      // 진단용: 변한 픽셀 중 밝은 것 / 붉은 것 / 최대 붉음
-let dbgPk = { hot:0, col:0, dom:0, rgb:"-", at:0 };
+let dbgPk = { hot:0, col:0, dom:0, d:0, rgb:"-", at:0 };
 const evlog = [];
 function logEv(t){ evlog.unshift(new Date().toTimeString().slice(0,8) + " " + t); if(evlog.length > 6) evlog.pop(); }
 
@@ -1523,11 +1523,12 @@ function processFrame(now){
     if(adiff > diffT) changed++;
     const isBright = gray > brightT;
     const rUp = r - bgR[i];                 // 배경 대비 빨강이 얼마나 늘었나
+    const mn = r < g ? (r < b ? r : b) : (g < b ? g : b);
+    const isCore = mn >= CFG.hit.coreMin && diff > CFG.hit.coreUp;   // 하얗게 포화된 레이저 중심
     let dom = 0, isColor = false;
-    if(mode === "red"){ dom = r - (g > b ? g : b); isColor = dom > redDom && r > 110 && rUp > 25; }
-    else if(mode === "green"){ dom = g - (r > b ? r : b); isColor = dom > redDom && g > 110; }
+    if(mode === "red"){ dom = r - (g > b ? g : b); isColor = (dom > redDom && r > 110 && rUp > 25) || isCore; }
+    else if(mode === "green"){ dom = g - (r > b ? r : b); isColor = (dom > redDom && g > 110) || isCore; }
     else isColor = isBright;
-    const hot = isBright || isColor;
     const inQuad = !quadMask || quadMask[i];
     if(!warming && adiff > diffT && inQuad && dom > topDom) topDom = dom;
     let a = hot ? BG_ALPHA * SLOW_RATIO : BG_ALPHA;
@@ -1537,7 +1538,7 @@ function processFrame(now){
       const age = hotAge[i] < 255 ? ++hotAge[i] : 255;
       if(age <= CFG.hit.stuckFrames){
         mask[i] = isColor ? 2 : 1;
-        const w = (isColor && mode !== "any") ? dom : adiff;
+        const w = (isColor && mode !== "any") ? (dom > diff ? dom : diff) : adiff;
         wmap[i] = w < 1 ? 1 : (w > 255 ? 255 : w);
       }else{
         a = 0.35;     // 오래 켜져 있는 반점은 배경으로 흡수
@@ -1547,8 +1548,11 @@ function processFrame(now){
     bgR[i]    = bgR[i] + (r - bgR[i]) * a;
   }
   dbg.hot = nHot; dbg.col = nCol; dbg.dom = topDom;
-  if(nHot >= dbgPk.hot || now - dbgPk.at > 2500){ dbgPk = { hot:nHot, col:nCol, dom:topDom, rgb:pkRGB, at:now }; }
-
+  if(now - dbgPk.at > 4000) dbgPk = { hot:0, col:0, dom:0, d:0, rgb:"-", at:now };
+  if(nHot > dbgPk.hot) dbgPk.hot = nHot;
+  if(nCol > dbgPk.col) dbgPk.col = nCol;
+  if(topDom > dbgPk.dom) dbgPk.dom = topDom;
+  if(pkD > dbgPk.d){ dbgPk.d = pkD; dbgPk.rgb = pkRGB; }
   updateArm(now);
 
   /* ③ 화면 전체 변화(손·조명)는 과녁과 RELOAD 양쪽에서 보류 */
