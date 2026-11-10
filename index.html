@@ -1526,7 +1526,7 @@ function processFrame(now){
     const mn = r < g ? (r < b ? r : b) : (g < b ? g : b);
     const isCore = mn >= CFG.hit.coreMin && diff > CFG.hit.coreUp;   // 하얗게 포화된 레이저 중심
     let dom = 0, isColor = false;
-    if(mode === "red"){ dom = r - (g > b ? g : b); isColor = (dom > redDom && r > 110 && rUp > 25) || isCore; }
+    if(mode === "red"){ dom = r - (g > b ? g : b); isColor = (dom > redDom && r > 70 && rUp > 25) || isCore; }
     else if(mode === "green"){ dom = g - (r > b ? r : b); isColor = (dom > redDom && g > 110) || isCore; }
     else isColor = isBright;
     const hot = isBright || isColor;
