@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,7 +12,8 @@
 <title>레이저 사격 타겟</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap"></noscript>
 <style>
 html{color-scheme:light dark}
 :root{
@@ -50,6 +51,7 @@ body{
   margin:0; background:var(--bg); color:var(--text);
   font-family:var(--sans); font-size:15px; line-height:1.55;
   -webkit-text-size-adjust:100%; overscroll-behavior-y:contain;
+  touch-action:manipulation;
 }
 button,input,select{font-family:inherit; font-size:inherit; color:inherit}
 button{cursor:pointer}
@@ -84,6 +86,7 @@ button{cursor:pointer}
 .zoompad{
   position:absolute; right:10px; bottom:10px; z-index:8;
   display:flex; flex-direction:column; align-items:stretch; gap:4px;
+  background:var(--surface);
   background:color-mix(in srgb, var(--surface) 90%, transparent);
   border:1px solid var(--line); border-radius:8px; padding:5px;
   box-shadow:var(--shadow); backdrop-filter:blur(6px);
@@ -112,7 +115,9 @@ button{cursor:pointer}
 .stage-empty p{margin:0; font-size:12.5px; color:var(--dim); max-width:34ch; line-height:1.5}
 .camerr{
   font-size:12.5px; line-height:1.55; color:var(--text); text-align:left;
+  background:var(--surface-2);
   background:color-mix(in srgb, var(--crit) 12%, transparent);
+  border:1px solid var(--crit);
   border:1px solid color-mix(in srgb, var(--crit) 45%, transparent);
   border-radius:6px; padding:10px 12px; max-width:46ch;
 }
@@ -163,7 +168,7 @@ input::placeholder{color:var(--faint)}
 }
 .btn:disabled{opacity:.4; cursor:not-allowed}
 .btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:600}
-.btn.danger{color:var(--crit); border-color:color-mix(in srgb, var(--crit) 40%, var(--line))}
+.btn.danger{color:var(--crit); border-color:var(--crit); border-color:color-mix(in srgb, var(--crit) 40%, var(--line))}
 .btn.sm{padding:7px 10px; font-size:12.5px}
 .btn.wide{width:100%}
 .msg{font-size:12.5px; margin-top:9px; min-height:17px; color:var(--good)}
@@ -207,7 +212,7 @@ td.score{font-family:var(--mono); font-weight:600; font-variant-numeric:tabular-
 .armline .btn{margin-left:auto; flex:none}
 .hint{font-size:12px; color:var(--faint); line-height:1.5; margin:9px 0 0}
 .hint b{color:var(--dim); font-weight:600}
-.warnbox{background:var(--accent-soft); border:1px solid color-mix(in srgb, var(--accent) 32%, transparent); border-radius:6px; padding:10px 12px; font-size:12.5px; line-height:1.55; color:var(--text)}
+.warnbox{background:var(--accent-soft); border:1px solid var(--accent); border:1px solid color-mix(in srgb, var(--accent) 32%, transparent); border-radius:6px; padding:10px 12px; font-size:12.5px; line-height:1.55; color:var(--text)}
 .warnbox b{font-weight:600}
 .sync-ok{color:var(--good); font-weight:600} .sync-wait{color:var(--warn)} .sync-off{color:var(--faint)}
 /* 설명글은 기본으로 접어둔다 — 상단 ? 버튼으로 펼친다 */
@@ -271,6 +276,7 @@ body.show-help .steps{display:flex}
 .fullbar{
   position:absolute; left:12px; right:60px; top:12px; z-index:9;
   display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+  background:var(--surface);
   background:color-mix(in srgb, var(--surface) 92%, transparent);
   border:1px solid var(--line); border-radius:9px; padding:8px 10px;
   box-shadow:var(--shadow); backdrop-filter:blur(6px);
@@ -300,7 +306,7 @@ body.kiosk-on{overflow:hidden}
 .k-foot b{color:var(--accent)} .k-foot .warn{color:var(--warn)}
 .k-actions{display:flex; gap:8px}
 .k-actions .btn{flex:1; padding:13px 10px; font-size:15px}
-.kiosk-exit{position:absolute; right:14px; top:14px; z-index:9; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:color-mix(in srgb, var(--surface) 88%, transparent); color:var(--dim); font-size:16px; line-height:1; display:grid; place-items:center}
+.kiosk-exit{position:absolute; right:14px; top:14px; z-index:9; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:var(--surface); background:color-mix(in srgb, var(--surface) 88%, transparent); color:var(--dim); font-size:16px; line-height:1; display:grid; place-items:center}
 .k-setup{position:absolute; left:50%; bottom:16px; transform:translateX(-50%); z-index:9; display:flex; gap:8px; align-items:center; padding:8px 10px; background:var(--surface); border:1px solid var(--line); border-radius:9px; box-shadow:var(--shadow); max-width:calc(100% - 24px)}
 .k-setup input{width:150px; padding:9px 10px}
 @media (max-width:900px){ .kiosk{grid-template-columns:1fr 220px} .k-stat .v{font-size:24px} .k-stat .v.total{font-size:32px} }
@@ -354,7 +360,6 @@ body.kiosk-on{overflow:hidden}
         <button role="tab" aria-selected="false" data-tab="calib">보정</button>
         <button role="tab" aria-selected="false" data-tab="records">기록</button>
       </div>
-
       <!-- ================= 사격 ================= -->
       <section class="panel" id="panel-shoot">
         <div class="block">
@@ -414,7 +419,6 @@ body.kiosk-on{overflow:hidden}
           </ul>
         </div>
       </section>
-
       <!-- ================= 보정 ================= -->
       <section class="panel" id="panel-calib" hidden>
         <div class="block">
@@ -549,7 +553,6 @@ body.kiosk-on{overflow:hidden}
           <p class="hint">여러 대를 함께 쓸 때 시트에 남는 이름입니다.</p>
         </div>
       </section>
-
       <!-- ================= 기록 ================= -->
       <section class="panel" id="panel-records" hidden>
         <div class="block">
@@ -593,14 +596,12 @@ body.kiosk-on{overflow:hidden}
     </div>
   </div>
 </div>
-
 <div class="diag" id="diagPanel" hidden>
   <div class="diag-head">진단 <button id="diagClose">✕</button></div>
   <table id="diagTable"></table>
   <div class="diag-live"><span class="diag-dot" id="diagDot"></span><span id="diagLive">레이저 감지 대기</span></div>
 </div>
 <div class="countdown" id="countdown" hidden><span id="countdownText">3</span></div>
-
 <!-- 전체화면 사격 모드 -->
 <div class="kiosk" id="kiosk">
   <div class="kiosk-left" id="kioskLeft">
@@ -633,19 +634,17 @@ body.kiosk-on{overflow:hidden}
     </div>
   </div>
 </div>
-
 <script>
 "use strict";
 /* =========================================================================
-   레이저 사격 타겟 v2.1 — 브라우저 단독 실행 + 구글 시트 기록 (접속 암호 없음)
+   레이저 사격 타겟 v2.2 — 브라우저 단독 실행 + 구글 시트 기록 (접속 암호 없음)
    ========================================================================= */
-const APP_VER = "2.1";
-
-/* 구글 시트 웹 앱 주소 (처음 여는 기기에 자동으로 채워진다) */
+const APP_VER = "2.2";
+/* 구글 시트 웹 앱 주소 (처음 여는 기기에 자동으로 채워진다)
+   접속 암호가 없으므로 이 주소가 유출되면 누구나 기록을 보낼 수 있다. 유출됐다면 새로 배포해서 바꾼다. */
 const DEFAULT_SHEET = {
   url: "https://script.google.com/macros/s/AKfycbw6_lNSdQTlSWVNEtRNRMVZb9hPAToyxVUe8qMI6CtUDd-IrKQESRDnA7rDSBD2vOmMcQ/exec"
 };
-
 /* ---------- 상수 ---------- */
 const TARGET_SIZE = 1000, MARGIN = 3, NUM_RINGS = 10, BLACK_FROM = 7;
 const CENTER = TARGET_SIZE / 2;
@@ -669,22 +668,21 @@ const CFG = {
 const MARKER_TARGET = [[54.36,61.90],[931.04,61.90],[931.04,938.34],[54.36,938.34]];
 const FULL_TARGET = [[0,0],[TARGET_SIZE,0],[TARGET_SIZE,TARGET_SIZE],[0,TARGET_SIZE]];
 const DET_W = 960;
+const DETECT_BUDGET_MS = 300;   // 마커 탐색이 화면을 막는 최대 시간
 const REDETECT_MS = 6000;
 const ZONE_W = 176, ZONE_WARM = 700;
 const LS = {
   corners:"ltw.corners", offset:"ltw.offset", tune:"ltw.tune", lane:"ltw.lane",
   records:"ltw.records", theme:"ltw.theme", camId:"ltw.camId", zone:"ltw.zone",
   zoneOpt:"ltw.zoneOpt", cornerTargets:"ltw.ctgt", autoTrack:"ltw.autoTrack",
-  zoneT:"ltw.zoneT", sheet:"ltw.sheet", lastCleared:"ltw.lastCleared"
+  zoneT:"ltw.zoneT", sheet:"ltw.sheet", lastCleared:"ltw.lastCleared", res:"ltw.res"
 };
-
 /* ---------- DOM ---------- */
 const $ = (id) => document.getElementById(id);
 const stage = $("stage"), video = $("video"), overlay = $("overlay");
 const targetCanvas = $("targetCanvas");
 const octx = overlay.getContext("2d");
 const tctx = targetCanvas.getContext("2d");
-
 /* ---------- 상태 ---------- */
 let stream = null, track = null;
 let corners = null, cornerTargets = FULL_TARGET;
@@ -708,6 +706,7 @@ let dwell = { t0:0, last:0, on:false, ratio:0 };
 let wakeLock = null;
 let dragPt = null;
 let showMaskOn = false;
+let resNote = "";
 /* 검출 버퍼 */
 let procCanvas = null, pctx = null, PW = 0, PH = 0, roi = null;
 let maskCanvas = null, mctx = null;
@@ -725,7 +724,6 @@ let dbg = { hot:0, col:0, dom:0 };      // 진단용: 변한 픽셀 중 밝은 �
 let dbgPk = { hot:0, col:0, dom:0, d:0, rgb:"-", at:0 };
 const evlog = [];
 function logEv(t){ evlog.unshift(new Date().toTimeString().slice(0,8) + " " + t); if(evlog.length > 6) evlog.pop(); }
-
 /* 테마 색 캐시 (매 프레임 getComputedStyle 방지) */
 let cssCache = null;
 function themeVars(){
@@ -739,7 +737,6 @@ function themeVars(){
   };
   return cssCache;
 }
-
 /* =========================================================================
    1. 기하 — 호모그래피
    ========================================================================= */
@@ -829,14 +826,50 @@ function syncZoneFromTarget(){
   resetZone = { x:nx, y:ny, w:nw, h:nh };
   try{ localStorage.setItem(LS.zone, JSON.stringify(resetZone)); }catch(e){}
 }
-function applyQuad(imgPts, targetPts, source, soft){
-  corners = imgPts; cornerTargets = targetPts;
+/* 보정 좌표는 영상 픽셀 기준이므로, 어떤 해상도에서 잡았는지 같이 적어둔다 */
+function saveRes(){
+  if(!video.videoWidth) return;
+  try{ localStorage.setItem(LS.res, JSON.stringify({ w:video.videoWidth, h:video.videoHeight })); }catch(e){}
+}
+function persistGeometry(){
   try{
-    localStorage.setItem(LS.corners, JSON.stringify(corners));
+    if(corners) localStorage.setItem(LS.corners, JSON.stringify(corners));
+    else localStorage.removeItem(LS.corners);
     localStorage.setItem(LS.cornerTargets, JSON.stringify(cornerTargets));
   }catch(e){}
+}
+function applyQuad(imgPts, targetPts, source, soft){
+  corners = imgPts; cornerTargets = targetPts;
+  persistGeometry();
+  saveRes();
   rebuildHomography(!!soft);
   detectState = source || "";
+}
+/* 카메라가 열렸을 때: 저장해둔 보정과 지금 영상 크기가 다르면 환산하거나 폐기한다 */
+function reconcileResolution(){
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if(!vw || !vh) return;
+  let saved = null;
+  try{ saved = JSON.parse(localStorage.getItem(LS.res) || "null"); }catch(e){}
+  if(saved && saved.w > 0 && saved.h > 0 && (Math.abs(saved.w - vw) > 2 || Math.abs(saved.h - vh) > 2) && (corners || resetZone)){
+    const sameShape = Math.abs((saved.w/saved.h) / (vw/vh) - 1) < 0.02;
+    if(sameShape){
+      const k = vw / saved.w;
+      if(corners) corners = corners.map(p => [p[0]*k, p[1]*k]);
+      if(resetZone) resetZone = { x:resetZone.x*k, y:resetZone.y*k, w:resetZone.w*k, h:resetZone.h*k };
+      persistGeometry();
+      if(resetZone) saveZone();
+      resNote = "카메라 해상도가 " + saved.w + "×" + saved.h + " → " + vw + "×" + vh + "로 바뀌어 저장된 위치를 환산했습니다. 어긋나 있으면 다시 인식시키세요.";
+    }else{
+      corners = null; cornerTargets = FULL_TARGET; H = null; Hinv = null; detectPoly = null; quadMask = null; detectState = "";
+      setZone(null); zoneOpt.on = false; $("zoneOn").checked = false;
+      try{ localStorage.removeItem(LS.corners); localStorage.removeItem(LS.cornerTargets); localStorage.removeItem(LS.zone); localStorage.removeItem(LS.zoneT); }catch(e){}
+      saveZone();
+      $("detectState").textContent = "아직 안 됨";
+      resNote = "카메라 화면 비율이 달라져서 저장된 보정과 RELOAD 영역을 지웠습니다. 다시 인식시켜 주세요.";
+    }
+  }
+  saveRes();
 }
 function pointInPoly(x, y, poly){
   let inside = false;
@@ -859,7 +892,6 @@ function buildQuadMask(){
 const inResetZone = (vx, vy) => !!(zoneOpt.on && resetZone &&
   vx >= resetZone.x && vx <= resetZone.x + resetZone.w &&
   vy >= resetZone.y && vy <= resetZone.y + resetZone.h);
-
 /* =========================================================================
    1-b. 과녁 자동 인식 — 네 모서리의 검은 마커
    ========================================================================= */
@@ -940,6 +972,7 @@ function isConvexQuad(p){
 function detectMarkers(){
   const G = grabGray();
   if(!G) return null;
+  const DEADLINE = performance.now() + DETECT_BUDGET_MS;   // 너무 오래 걸리면 포기하고 화면을 풀어준다
   const { vw, dw, dh, n, gray, hist } = G;
   const thr = otsuThreshold(hist, n);
   const bin = new Uint8Array(n);
@@ -986,9 +1019,9 @@ function detectMarkers(){
   };
   let bestQuad = null, bestScore = 0;
   const tried = Object.create(null);
-  let budget = 15000;
+  let budget = 8000;
   const tryQuad = (four) => {
-    if(budget <= 0) return;
+    if(budget <= 0 || performance.now() > DEADLINE) return;
     const full = sortCorners(four.map(c => [c.mx, c.my]));   // 무게중심 사용
     if(!isConvexQuad(full)) return;
     const side = [0,1,2,3].map(i => Math.hypot(full[(i+1)%4][0]-full[i][0], full[(i+1)%4][1]-full[i][1]));
@@ -1026,6 +1059,7 @@ function detectMarkers(){
   };
   const seeds = Math.min(cands.length, 20);
   for(let s = 0; s < seeds; s++){
+    if(performance.now() > DEADLINE) break;
     const A = cands[s].area;
     for(const ratio of [2.0, 3.5, 6.0])
       searchGroup(cands.filter(c => c.area >= A/ratio && c.area <= A*ratio));
@@ -1178,7 +1212,6 @@ function runAutoDetect(manual){
   }
   return true;
 }
-
 /* =========================================================================
    2. 채점
    ========================================================================= */
@@ -1193,7 +1226,6 @@ function calcScore(tx, ty){
   const score = ring + frac * 0.9;
   return Math.max(0, Math.min(Math.round(score * 10) / 10, 10.9));
 }
-
 /* =========================================================================
    3. 과녁 그리기
    ========================================================================= */
@@ -1263,7 +1295,6 @@ function drawHitMark(c, x, y, n, faded){
   c.fillText(String(n), lx, ly);
   c.restore();
 }
-
 /* =========================================================================
    4. 카메라
    ========================================================================= */
@@ -1275,7 +1306,15 @@ function camFail(msg, extra){
   setMsg("detailMsg", msg.replace(/<[^>]+>/g, ""), "err");
   setMsg("sessionMsg", msg.replace(/<[^>]+>/g, ""), "err");
 }
+/* 동시에 두 번 열리는 것을 막는다 (자동 시작 + 버튼 클릭이 겹칠 때 스트림이 새는 문제) */
+let camStarting = false;
 async function startCamera(deviceId){
+  if(camStarting) return;
+  camStarting = true;
+  try{ await startCameraInner(deviceId); }
+  finally{ camStarting = false; }
+}
+async function startCameraInner(deviceId){
   setCam("warm", "카메라 여는 중");
   $("camErr").hidden = true;
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
@@ -1293,7 +1332,15 @@ async function startCamera(deviceId){
     attempts.push({ video:{ ...base, facingMode:{ ideal:"environment" } }, audio:false });
     attempts.push({ video:{ facingMode:{ ideal:"environment" } }, audio:false });
     attempts.push({ video:true, audio:false });
-    const withTimeout = (pr) => Promise.race([ pr, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 12000)) ]);
+    /* 시간 초과로 포기한 뒤 늦게 열린 스트림은 바로 닫는다 (안 그러면 카메라가 계속 켜져 있다) */
+    const withTimeout = (pr) => new Promise((res, rej) => {
+      let late = false;
+      const t = setTimeout(() => { late = true; rej(new Error("timeout")); }, 12000);
+      pr.then(
+        s => { clearTimeout(t); if(late){ try{ s.getTracks().forEach(x => x.stop()); }catch(e){} } else res(s); },
+        e => { clearTimeout(t); if(!late) rej(e); }
+      );
+    });
     let lastErr = null;
     for(const c of attempts){
       try{
@@ -1314,6 +1361,7 @@ async function startCamera(deviceId){
       video.onloadedmetadata = () => res();
       setTimeout(res, 3000);
     });
+    reconcileResolution();
     setupZoom();
     setupProcessing();
     await listCameras();
@@ -1334,6 +1382,7 @@ async function startCamera(deviceId){
     }else{
       setMsg("detailMsg", corners ? "저장해둔 과녁 위치를 불러왔습니다." : "보정 탭에서 과녁을 인식시켜 주세요.", "info");
     }
+    if(resNote){ setMsg("detailMsg", resNote, "err"); resNote = ""; }
   }catch(err){
     const name = err && err.name || "";
     const timedOut = err && err.message === "timeout";
@@ -1462,7 +1511,6 @@ async function applyZoom(v, silent){
     }
   }catch(e){}
 }
-
 /* =========================================================================
    5. 검출 — 새 프레임당 1회, 노출 보정, 연속 프레임 확인, 서브픽셀 중심
    ========================================================================= */
@@ -1478,10 +1526,8 @@ function processFrame(now){
   let img;
   try{ img = pctx.getImageData(0, 0, PW, PH); }catch(e){ return; }
   const d = img.data, n = PW * PH;
-
   fpsCount++;
   if(now - fpsAt > 1000){ fpsVal = fpsCount * 1000 / (now - fpsAt); fpsCount = 0; fpsAt = now; }
-
   if(!warmStart){
     for(let i=0, p=0; i<n; i++, p+=4){
       bgGray[i] = (d[p]*77 + d[p+1]*150 + d[p+2]*29) >> 8;
@@ -1491,7 +1537,6 @@ function processFrame(now){
     return;
   }
   const warming = (now - warmStart) < WARMUP_MS;
-
   if(--meanTick <= 0){
     meanTick = 10;
     let sg = 0, sr = 0;
@@ -1501,7 +1546,6 @@ function processFrame(now){
   }
   const brightT = Math.min(Math.max(bgMeanCache + tune.bright, 110), 250);
   const diffT = tune.diff, redDom = tune.red, mode = tune.color;
-
   /* ① 노출·조명 보정 — 화면 전체가 같이 밝아지거나 어두워진 만큼은 변화로 치지 않는다 */
   let ss = 0, sc = 0;
   for(let i=0, p=0; i<n; i+=7, p+=28){
@@ -1510,7 +1554,6 @@ function processFrame(now){
     if(df > -40 && df < 40){ ss += df; sc++; }
   }
   gShift = sc ? Math.max(-30, Math.min(30, ss / sc)) : 0;
-
   /* ② 후보 마스크 + 배경 갱신 + 정체(반사·반점) 픽셀 제거 */
   let changed = 0, nHot = 0, nCol = 0, topDom = 0, pkD = 0, pkRGB = "-";
   mask.fill(0);
@@ -1555,20 +1598,16 @@ function processFrame(now){
   if(topDom > dbgPk.dom) dbgPk.dom = topDom;
   if(pkD > dbgPk.d){ dbgPk.d = pkD; dbgPk.rgb = pkRGB; }
   updateArm(now);
-
   /* ③ 화면 전체 변화(손·조명)는 과녁과 RELOAD 양쪽에서 보류 */
   const bigChange = changed / n > MAX_CHANGED;
   if(bigChange) lastBigChange = now;
   const settling = (now - lastBigChange) < SETTLE_MS;
-
   /* ④ RELOAD 감시 */
   const zoneFired = zoneUpdate(now, bigChange || settling);
   if(zoneFired && armed && !counting){ handleReloadPulse(now); return; }
-
   if(warming){ setCam("warm", "배경 학습 중"); return; }
   if(stream) setCam("on", "인식 중");
   if(bigChange || settling){ lastCand = 0; hitTrack = null; return; }
-
   /* ⑤ 블롭 선택 */
   maxFilter3(mask, mask2, PW, PH);
   const blobs = findBlobs(mask2, PW, PH);
@@ -1692,7 +1731,6 @@ function findBlobs(m, W, Hh){
   }
   return out;
 }
-
 /* =========================================================================
    5-b. RELOAD 영역 감시 — 색 증거 필수, 약한 신호는 2프레임, 과녁 겹침 제외
    ========================================================================= */
@@ -1735,14 +1773,12 @@ function zoneUpdate(now, vetoed){
   let img;
   try{ img = ZW.cx.getImageData(0, 0, zw, zh); }catch(e){ return false; }
   const d = img.data, n = zw * zh;
-
   if(!ZW.warmAt){
     for(let i=0, p=0; i<n; i++, p+=4) bg[i] = (d[p]*77 + d[p+1]*150 + d[p+2]*29) >> 8;
     ZW.warmAt = now; zoneWhy = "학습 중";
     return false;
   }
   const warming = (now - ZW.warmAt) < ZONE_WARM;
-
   let ss = 0, sc = 0;
   for(let i=0, p=0; i<n; i++, p+=4){
     if(excl[i]) continue;
@@ -1750,13 +1786,11 @@ function zoneUpdate(now, vetoed){
     if(df > -40 && df < 40){ ss += df; sc++; }
   }
   const shift = sc > 20 ? Math.max(-30, Math.min(30, ss / sc)) : 0;
-
   const sens = zoneOpt.sens || 6;
   const mode = tune.color, redDom = tune.red, diffT = tune.diff;
   const colorMode = mode !== "any";
   const briT = Math.max(14, 50 - sens*4);
   const minHot = Math.max(2, 9 - sens);
-
   mark.fill(0);
   let colorPx = 0, changed = 0, valid = 0, maxUp = 0, maxDom = 0;
   for(let i=0, p=0; i<n; i++, p+=4){
@@ -1781,7 +1815,6 @@ function zoneUpdate(now, vetoed){
     }
     bg[i] = bgv + (gray - bgv) * alpha;
   }
-
   /* 색 모드에서는 색 픽셀이 증거다. 밝기·포화 픽셀은 색 픽셀 2칸 이내일 때만 인정한다
      (레이저 중심이 하얗게 타도 둘레는 붉다). 밝기만 변한 것(그림자·노출)은 탈락. */
   let hot = 0, hx0 = zw, hx1 = -1, hy0 = zh, hy1 = -1;
@@ -1807,7 +1840,6 @@ function zoneUpdate(now, vetoed){
     }
   }
   zoneHot = hot; zoneUp = maxUp; zoneDom = maxDom;
-
   let signal = false, strong = false;
   if(warming)                     { zoneWhy = "학습 중"; }
   else if(vetoed)                 { zoneWhy = "화면 전체 변화(보류)"; }
@@ -1827,7 +1859,6 @@ function zoneUpdate(now, vetoed){
       else { signal = true; zoneWhy = strong ? "또렷한 신호" : "약한 신호(2프레임 확인)"; }
     }
   }
-
   if(!signal){
     ZW.streak = 0; ZW.sigSince = 0;
     if(warming || vetoed){ ZW.quietSince = 0; return false; }
@@ -1868,7 +1899,6 @@ function handleReloadPulse(now){
   }
   doLaserReset();
 }
-
 /* =========================================================================
    6. 세션 · 탄착
    ========================================================================= */
@@ -1877,6 +1907,16 @@ let armed = false;
 let disarmUntil = 0;
 let emptyResets = 0, lastResetAt = 0;
 let lastZoneFire = -1e9;
+/* 사격 전에는 선택창의 값, 사격 중에는 시작할 때 고정한 값을 쓴다 */
+function limShots(){
+  if(session.running) return session.limitShots;
+  return parseInt($("shotLimit").value, 10) || session.limitShots;
+}
+function limSec(){
+  if(session.running) return session.limitSec;
+  const v = parseInt($("timeLimit").value, 10);
+  return isNaN(v) ? session.limitSec : v;
+}
 function registerHit(tx, ty){
   if(counting) return;
   if(!session.running || session.paused){
@@ -1905,6 +1945,14 @@ function updateArm(now){
   if(calibMode || zoneMode || fullCam || counting) return;
   if((now || performance.now()) < disarmUntil) return;
   armed = true;
+}
+function unlockAudio(){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === "suspended") audioCtx.resume();
+    const buf = audioCtx.createBuffer(1, 1, 22050), src = audioCtx.createBufferSource();
+    src.buffer = buf; src.connect(audioCtx.destination); src.start(0);
+  }catch(e){}
 }
 function tone(freq, dur, vol){
   if(!$("soundOn").checked) return;
@@ -2008,6 +2056,9 @@ function startSession(msg){
   renderShots(); updateScorebar(); drawTarget(); renderKiosk(); drawOverlay();
   setMsg("sessionMsg", msg || "준비하세요…", "info");
   runCountdown(beginSession);
+  /* 카운트다운 중에도 정지(취소)할 수 있게 한다 */
+  $("startBtn").disabled = true; $("stopBtn").disabled = false;
+  renderKioskStats();
   return true;
 }
 function beginSession(){
@@ -2056,13 +2107,14 @@ function togglePause(){
 }
 const total = () => hits.reduce((s,h) => s + h.score, 0);
 function updateScorebar(){
-  $("shotCountView").textContent = hits.length + "/" + session.limitShots;
+  const ls = limShots(), lt = limSec();
+  $("shotCountView").textContent = hits.length + "/" + ls;
   $("totalView").textContent = total().toFixed(1);
   const tv = $("timerView");
-  if(!session.limitSec){ tv.textContent = "제한 없음"; tv.className = "v text"; renderKioskStats(); return; }
+  if(!lt){ tv.textContent = "제한 없음"; tv.className = "v text"; renderKioskStats(); return; }
   let rem = session.running
     ? (session.paused ? session.remain : Math.max(0, (session.endAt - Date.now())/1000))
-    : session.limitSec;
+    : lt;
   const m = Math.floor(rem/60), s = Math.floor(rem%60);
   tv.textContent = String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
   tv.className = "v" + (session.running && !session.paused ? (rem <= 10 ? " over" : " run") : "");
@@ -2090,7 +2142,6 @@ function renderShots(){
   $("shotEmpty").hidden = hits.length > 0;
   $("liveNote").textContent = hits.length ? "총 " + total().toFixed(1) + "점" : "";
 }
-
 /* ---- 지워진 기록 복구 ---- */
 function snapshotHits(){
   if(!hits.length) return;
@@ -2124,7 +2175,6 @@ function restoreLastCleared(){
   renderShots(); drawTarget(); updateScorebar(); renderKiosk(); renderUndo();
   setMsg("sessionMsg", "지워진 기록을 복구했습니다. 필요하면 '기록 저장'을 누르세요.", "");
 }
-
 /* =========================================================================
    7. 기록 저장 + 구글 시트 전송
    ========================================================================= */
@@ -2133,8 +2183,10 @@ function loadRecords(){
   try{ records = JSON.parse(localStorage.getItem(LS.records) || "[]"); }
   catch(e){ records = []; }
 }
+/* 저장에 실패하면(저장 공간 부족 등) false */
 function saveRecords(){
-  try{ localStorage.setItem(LS.records, JSON.stringify(records)); }catch(e){}
+  try{ localStorage.setItem(LS.records, JSON.stringify(records)); return true; }
+  catch(e){ return false; }
 }
 function sessionMeta(reasonOverride){
   const endedAt = session.running ? Date.now() : (session.endedAt || Date.now());
@@ -2166,10 +2218,18 @@ function saveSession(reasonOverride){
   };
   records.unshift(rec);
   lastSavedSig = sig;
-  saveRecords(); renderRecords();
-  setMsg("saveMsg", name + " · " + hits.length + "발 / " + total().toFixed(1) + "점 저장했습니다."
-    + (sheetCfg.url && sheetCfg.auto ? " 시트로 보내는 중…" : ""), "");
-  if(sheetCfg.url && sheetCfg.auto) syncPending(false);
+  const stored = saveRecords();
+  renderRecords();
+  const willSync = sheetCfg.url && sheetCfg.auto;
+  if(stored){
+    setMsg("saveMsg", name + " · " + hits.length + "발 / " + total().toFixed(1) + "점 저장했습니다."
+      + (willSync ? " 시트로 보내는 중…" : ""), "");
+  }else{
+    setMsg("saveMsg", name + " · " + hits.length + "발 / " + total().toFixed(1)
+      + "점 — 이 기기에 저장하지 못했습니다(저장 공간 부족). 오래된 기록을 삭제하거나 CSV로 내려받으세요."
+      + (willSync ? " 시트로는 보내는 중…" : ""), "err");
+  }
+  if(willSync) syncPending(false);
   return true;
 }
 function renderRecords(){
@@ -2180,7 +2240,9 @@ function renderRecords(){
     const dt = new Date(r.savedAt);
     const when = dt.toLocaleDateString("ko-KR",{month:"numeric",day:"numeric"}) + " " + dt.toTimeString().slice(0,5);
     const sync = !sheetCfg.url ? '<span class="sync-off">–</span>'
-               : r.synced ? '<span class="sync-ok">✓</span>' : '<span class="sync-wait">대기</span>';
+               : r.synced ? '<span class="sync-ok">✓</span>'
+               : r.syncError ? '<span class="sync-wait" title="' + escapeHtml(r.syncError) + '">오류</span>'
+               : '<span class="sync-wait">대기</span>';
     tr.innerHTML =
       '<td><input type="checkbox" data-rid="' + escapeHtml(r.id) + '" style="width:16px;height:16px;accent-color:var(--accent)"></td>' +
       '<td>' + escapeHtml(r.name) + '</td>' +
@@ -2201,8 +2263,9 @@ function escapeHtml(s){
 const selectedIds = () =>
   [...document.querySelectorAll("#recTable input[type=checkbox]:checked")].map(c => c.dataset.rid);
 const csvCell = (v) => {
+  if(typeof v === "number") return String(v);          // 숫자(음수 포함)는 그대로
   let s = String(v);
-  if(/^[=+\-@]/.test(s)) s = "'" + s;       // 엑셀 수식 오인 방지
+  if(/^[=+\-@]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = "'" + s;   // 엑셀 수식 오인 방지 (순수 숫자는 제외)
   return '"' + s.replace(/"/g, '""') + '"';
 };
 function exportCsv(){
@@ -2230,7 +2293,6 @@ function exportCsv(){
     setMsg("recMsg", "내려받지 못했습니다.", "err");
   }
 }
-
 /* ---- 구글 시트 (접속 암호 없음) ---- */
 let sheetCfg = { url:"", auto:true, sheetUrl:"" };
 let syncing = false;
@@ -2241,15 +2303,20 @@ function loadSheetCfg(){
   }catch(e){}
   /* 저장된 값이 없으면 코드에 적어둔 기본 주소를 쓴다 */
   if(!sheetCfg.url && DEFAULT_SHEET.url) sheetCfg.url = DEFAULT_SHEET.url;
-  /* 주소 뒤에 #sheet=웹앱주소 를 붙여 열면 그 주소로 바뀐다 */
+  /* 주소 뒤에 #sheet=웹앱주소 를 붙여 열면 그 주소로 바뀐다 (형식 검사 + 확인창) */
   try{
     if(location.hash.length > 1){
-      const u = new URLSearchParams(location.hash.slice(1)).get("sheet");
+      const u = (new URLSearchParams(location.hash.slice(1)).get("sheet") || "").trim();
       if(u){
-        sheetCfg.url = u.trim();
-        saveSheetCfg();
-        history.replaceState(null, "", location.pathname + location.search);
+        if(!validSheetUrl(u)){
+          alert("링크에 들어 있는 시트 주소가 올바른 형식이 아니어서 무시했습니다.");
+        }else if(u !== sheetCfg.url && confirm("기록을 보낼 구글 시트 주소를 바꿀까요?\n\n" + u + "\n\n본인이 만든 주소가 아니면 '취소'를 누르세요.")){
+          sheetCfg.url = u;
+          sheetCfg.sheetUrl = "";
+          saveSheetCfg();
+        }
       }
+      history.replaceState(null, "", location.pathname + location.search);
     }
   }catch(e){}
 }
@@ -2259,12 +2326,14 @@ function fillSheetUI(){
   $("sheetAuto").checked = sheetCfg.auto;
   renderSheetStatus();
 }
-function pendingCount(){ return records.filter(r => !r.synced).length; }
+function pendingCount(){ return records.filter(r => !r.synced && !r.syncError).length; }
 function renderSheetStatus(){
   const el = $("sheetPending");
   if(!el) return;
   const n = pendingCount();
-  el.textContent = !sheetCfg.url ? "연결 안 됨" : (n ? "전송 대기 " + n + "건" : "모두 전송됨");
+  const bad = records.filter(r => !r.synced && r.syncError).length;
+  el.textContent = !sheetCfg.url ? "연결 안 됨"
+    : (n ? "전송 대기 " + n + "건" : (bad ? "오류 " + bad + "건" : "모두 전송됨"));
   const a = $("sheetOpen");
   if(sheetCfg.sheetUrl){ a.href = sheetCfg.sheetUrl; a.hidden = false; } else a.hidden = true;
 }
@@ -2282,17 +2351,28 @@ async function fetchJson(url, opt){
 function sheetErrText(code){
   return ({
     bad_response: "응답을 읽지 못했습니다. 배포 설정이 '모든 사용자'인지, URL이 /exec 로 끝나는지 확인하세요.",
+    bad_json: "시트가 받은 내용을 읽지 못했습니다. 잠시 뒤 다시 시도합니다.",
     rate_limited: "짧은 시간에 너무 많이 보냈습니다. 잠시 뒤 자동으로 다시 보냅니다.",
+    busy: "시트가 다른 기록을 쓰는 중입니다. 잠시 뒤 자동으로 다시 보냅니다.",
+    empty: "빈 요청이 전달됐습니다.",
+    too_large: "기록 하나가 너무 큽니다.",
+    no_record: "기록 내용이 비어 있습니다.",
+    no_id: "기록 번호가 없습니다.",
     no_hits: "발사 기록이 비어 있습니다.",
     too_many_hits: "발사 수가 너무 많습니다.",
-    unknown_action: "code.gs가 옛 버전입니다. 새 버전으로 다시 배포하세요."
+    unknown_action: "code.gs가 옛 버전입니다. 새 버전으로 다시 배포하세요.",
+    unauthorized: "code.gs가 접속 암호를 요구하는 옛 버전입니다. 암호 없는 새 code.gs로 다시 배포하세요.",
+    not_configured: "code.gs가 접속 암호를 요구하는 옛 버전입니다. 암호 없는 새 code.gs로 다시 배포하세요."
   })[code] || code || "알 수 없는 오류";
 }
+/* 기록 자체가 문제라서 다시 보내도 소용없는 오류 / 시트 전체 문제라서 중단해야 하는 오류 */
+const SHEET_BAD_RECORD = ["no_hits", "too_many_hits", "no_id", "no_record", "too_large", "empty"];
+const SHEET_FATAL = ["bad_response", "bad_json", "rate_limited", "busy", "unknown_action", "unauthorized", "not_configured"];
 function toSheetRecord(r){
   return {
     id: String(r.id), name:r.name, lane:r.lane, savedAt:r.savedAt, startedAt:r.startedAt || "",
     durationSec:r.durationSec || 0, timeLimit:r.timeLimit || 0, shotLimit:r.shotLimit || r.hits.length,
-    endReason:r.endReason || "", device:(navigator.userAgent || "").slice(0, 80) + " · v" + APP_VER,
+    endReason:r.endReason || "", device:(navigator.userAgent || "").slice(0, 60) + " · v" + APP_VER,
     hits: r.hits.map(h => ({ no:h.no, score:h.score, x:h.x, y:h.y, ts: h.ts ? new Date(h.ts).toISOString() : "" }))
   };
 }
@@ -2314,7 +2394,8 @@ async function syncPending(manual){
     if(manual) setMsg("sheetMsg", "먼저 웹 앱 URL을 입력하세요.", "err");
     return;
   }
-  const list = records.filter(r => !r.synced).reverse();     // 오래된 것부터
+  if(manual) records.forEach(r => { if(r.syncError) delete r.syncError; });   // 수동으로 누르면 오류 기록도 다시 시도
+  const list = records.filter(r => !r.synced && !r.syncError).reverse();     // 오래된 것부터
   if(!list.length){ if(manual) setMsg("sheetMsg", "보낼 기록이 없습니다.", "info"); renderRecords(); return; }
   if(!navigator.onLine){ if(manual) setMsg("sheetMsg", "인터넷에 연결돼 있지 않습니다. 연결되면 자동으로 보냅니다.", "err"); return; }
   syncing = true;
@@ -2327,22 +2408,23 @@ async function syncPending(manual){
         headers:{ "Content-Type":"text/plain;charset=utf-8" },    // 사전 요청(preflight) 없이 보낸다
         body: JSON.stringify({ action:"save", record:toSheetRecord(r) })
       });
-      if(j && j.ok){ r.synced = true; r.syncedAt = new Date().toISOString(); ok++; }
+      if(j && j.ok){ r.synced = true; r.syncedAt = new Date().toISOString(); delete r.syncError; ok++; }
       else{
-        fail++; lastErr = sheetErrText(j && j.error);
-        if(j && (j.error === "bad_response" || j.error === "rate_limited" || j.error === "unknown_action")) break;
+        const code = j && j.error;
+        fail++; lastErr = sheetErrText(code);
+        if(SHEET_BAD_RECORD.indexOf(code) >= 0){ r.syncError = code; continue; }   // 이 기록은 건너뛰고 다음 것
+        if(SHEET_FATAL.indexOf(code) >= 0) break;                                   // 전체 문제 → 중단
       }
     }catch(e){
       fail++; lastErr = "네트워크 오류"; break;
     }
   }
   syncing = false;
-  saveRecords(); renderRecords();
-  if(fail) setMsg("sheetMsg", ok + "건 전송, " + (list.length - ok) + "건 대기 중 — " + lastErr, "err");
-  else if(ok) setMsg("sheetMsg", ok + "건을 시트에 보냈습니다.", "");
+  const stored = saveRecords(); renderRecords();
+  if(fail) setMsg("sheetMsg", ok + "건 전송, " + (list.length - ok) + "건 대기/오류 — " + lastErr, "err");
+  else if(ok) setMsg("sheetMsg", ok + "건을 시트에 보냈습니다." + (stored ? "" : " (이 기기에 상태를 저장하지 못했습니다)"), stored ? "" : "err");
   if(ok && !fail) setMsg("saveMsg", $("saveMsg").textContent.replace(" 시트로 보내는 중…", " 시트에도 기록했습니다."), "");
 }
-
 /* =========================================================================
    8. 보정 UI
    ========================================================================= */
@@ -2444,6 +2526,7 @@ function saveZone(){
     else localStorage.removeItem(LS.zoneT);
   }catch(e){}
   try{ localStorage.setItem(LS.zoneOpt, JSON.stringify(zoneOpt)); }catch(e){}
+  saveRes();
 }
 /* 누른 자리 주변의 검은 덩어리를 훑어 표식 전체를 잡는다 */
 function growZoneAt(vx, vy){
@@ -2451,7 +2534,7 @@ function growZoneAt(vx, vy){
   if(!G) return null;
   const { vw, dw, dh, n, gray, hist } = G;
   const thr = otsuThreshold(hist, n);
-  const px = vx * dw/vw, py = vy * dh/G.vh;
+  const px = vx * dw / vw, py = vy * dh / G.vh;
   const reach = dw * 0.16;
   const bin = new Uint8Array(n);
   const boxes = [];
@@ -2598,7 +2681,6 @@ function nudge(dir){
   try{ localStorage.setItem(LS.offset, JSON.stringify(offset)); }catch(e){}
   $("offsetMsg").textContent = "보정값 X " + Math.round(offset.x) + " / Y " + Math.round(offset.y);
 }
-
 /* =========================================================================
    9. 화면 갱신
    ========================================================================= */
@@ -3034,15 +3116,16 @@ function renderKioskStats(){
   nv.textContent = nm || "이름을 입력하세요";
   nv.classList.toggle("empty", !nm);
   $("kTotal").textContent = total().toFixed(1);
-  $("kShots").textContent = hits.length + "/" + session.limitShots;
+  $("kShots").textContent = hits.length + "/" + limShots();
   const tv = $("kTimer");
-  if(!session.limitSec){ tv.textContent = "제한 없음"; tv.className = "v text"; }
+  const lt = limSec();
+  if(!lt){ tv.textContent = "제한 없음"; tv.className = "v text"; }
   else{
-    const rem = session.running ? (session.paused ? session.remain : Math.max(0, (session.endAt - Date.now())/1000)) : session.limitSec;
+    const rem = session.running ? (session.paused ? session.remain : Math.max(0, (session.endAt - Date.now())/1000)) : lt;
     tv.textContent = String(Math.floor(rem/60)).padStart(2,"0") + ":" + String(Math.floor(rem%60)).padStart(2,"0");
     tv.className = "v" + (session.running && !session.paused ? (rem <= 10 ? " over" : " run") : "");
   }
-  $("kStop").disabled = !session.running;
+  $("kStop").disabled = !(session.running || counting);
   $("kSave").disabled = !hits.length;
 }
 function renderKiosk(){
@@ -3056,12 +3139,15 @@ function renderKiosk(){
     row.innerHTML = '<span class="n">' + (hits.length - i) + '발</span><span class="' + scoreClass(h.score) + '">' + h.score.toFixed(1) + '</span>';
     list.appendChild(row);
   });
+  const stopped = !armed && performance.now() < disarmUntil - 20000;   // 정지 버튼으로 RELOAD를 끈 상태
   $("kFoot").innerHTML = !corners
     ? '과녁이 아직 인식되지 않았습니다. 나가서 <b>보정 탭 → 과녁 자동 인식</b>을 먼저 해주세요.'
-    : (zoneOpt.on && resetZone)
-      ? (session.running ? '다음 사수로 넘어가려면 ' : '시작하려면 ') + '<b>RELOAD 영역</b>에 레이저를 쏘세요.' +
-        (session.running && hits.length ? ' (사격 중에는 두 번)' : '') + (armed ? '' : ' <span class="warn">(준비 중)</span>')
-      : 'RELOAD 영역이 꺼져 있어 넘어갈 때마다 화면을 눌러야 합니다.';
+    : stopped
+      ? '정지했습니다. <b>사격 시작</b>을 누르면 RELOAD도 다시 켜집니다.'
+      : (zoneOpt.on && resetZone)
+        ? (session.running ? '다음 사수로 넘어가려면 ' : '시작하려면 ') + '<b>RELOAD 영역</b>에 레이저를 쏘세요.' +
+          (session.running && hits.length ? ' (사격 중에는 두 번)' : '') + (armed ? '' : ' <span class="warn">(준비 중)</span>')
+        : 'RELOAD 영역이 꺼져 있어 넘어갈 때마다 화면을 눌러야 합니다.';
 }
 /* 9-d. 진단 */
 let diagOn = false, diagTick = 0;
@@ -3100,7 +3186,6 @@ function renderDiag(){
   else if(lastCand > 0){ dot.className = "diag-dot hit"; live.textContent = "지금 후보 " + lastCand + "개가 보입니다"; }
   else{ dot.className = "diag-dot"; live.textContent = stream ? "레이저 감지 대기" : "카메라가 꺼져 있습니다"; }
 }
-
 /* =========================================================================
    10. 소리
    ========================================================================= */
@@ -3121,7 +3206,15 @@ function beep(score){
     osc.start(t); osc.stop(t + 0.18);
   }catch(e){}
 }
-
+/* 첫 터치/클릭 때 오디오를 미리 깨워둔다 — 레이저(터치가 아님)로만 시작해도 소리가 나도록 */
+(function(){
+  const evs = ["pointerdown", "touchend", "keydown", "click"];
+  const onFirst = () => {
+    unlockAudio();
+    if(audioCtx && audioCtx.state === "running") evs.forEach(e => document.removeEventListener(e, onFirst, true));
+  };
+  evs.forEach(e => document.addEventListener(e, onFirst, true));
+})();
 /* =========================================================================
    11. 초기화 · 이벤트
    ========================================================================= */
@@ -3245,6 +3338,7 @@ function bind(){
   $("stopBtn").addEventListener("click", () => stopSession("수동 정지", true));
   $("saveBtn").addEventListener("click", () => saveSession());
   $("clearBtn").addEventListener("click", () => {
+    cancelCountdown();               // 카운트다운 중에 눌러도 그대로 사격이 시작되지 않도록
     snapshotHits();
     reloadPending = false;
     hits = []; holdArm(1500); session.running = false;
@@ -3380,7 +3474,12 @@ function bind(){
     setMsg("recMsg", ids.length + "건을 삭제했습니다.", "");
   });
   /* 시트 연동 */
-  $("sheetUrl").addEventListener("change", e => { sheetCfg.url = e.target.value.trim(); sheetCfg.sheetUrl = ""; saveSheetCfg(); renderRecords(); });
+  $("sheetUrl").addEventListener("change", e => {
+    sheetCfg.url = e.target.value.trim(); sheetCfg.sheetUrl = ""; saveSheetCfg(); renderRecords();
+    if(sheetCfg.url && !validSheetUrl(sheetCfg.url)){
+      setMsg("sheetMsg", "주소 형식이 올바르지 않습니다. https://script.google.com/macros/s/…/exec 형태여야 합니다.", "err");
+    }
+  });
   $("sheetAuto").addEventListener("change", e => { sheetCfg.auto = e.target.checked; saveSheetCfg(); });
   $("sheetTestBtn").addEventListener("click", () => {
     sheetCfg.url = $("sheetUrl").value.trim(); saveSheetCfg();
@@ -3442,7 +3541,6 @@ function selfTest(){
   t("안쪽이 더 높다", calcScore(500, 540) > calcScore(500, 580));
   console.log(out.join("\n"));
 }
-
 /* ---------- 시작 ---------- */
 loadSettings();
 loadSheetCfg();
