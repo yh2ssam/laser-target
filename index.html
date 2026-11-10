@@ -722,6 +722,7 @@ let zoneHot = 0, zoneShape = "", zoneUp = 0, zoneDom = 0, zoneWhy = "";
 let reloadPending = false, reloadPendingAt = 0;
 let lastCleared = null, lastSavedSig = "";
 let dbg = { hot:0, col:0, dom:0 };      // 진단용: 변한 픽셀 중 밝은 것 / 붉은 것 / 최대 붉음
+let dbgPk = { hot:0, col:0, dom:0, rgb:"-", at:0 };
 const evlog = [];
 function logEv(t){ evlog.unshift(new Date().toTimeString().slice(0,8) + " " + t); if(evlog.length > 6) evlog.pop(); }
 
@@ -1511,7 +1512,7 @@ function processFrame(now){
   gShift = sc ? Math.max(-30, Math.min(30, ss / sc)) : 0;
 
   /* ② 후보 마스크 + 배경 갱신 + 정체(반사·반점) 픽셀 제거 */
-  let changed = 0, nHot = 0, nCol = 0, topDom = 0;
+  let changed = 0, nHot = 0, nCol = 0, topDom = 0, pkD = 0, pkRGB = "-";
   mask.fill(0);
   for(let i=0, p=0; i<n; i++, p+=4){
     const r = d[p], g = d[p+1], b = d[p+2];
@@ -1532,6 +1533,7 @@ function processFrame(now){
     let a = hot ? BG_ALPHA * SLOW_RATIO : BG_ALPHA;
     if(!warming && adiff > diffT && hot && inQuad){
       nHot++; if(isColor) nCol++;
+      if(adiff > pkD){ pkD = adiff; pkRGB = r + "," + g + "," + b; }
       const age = hotAge[i] < 255 ? ++hotAge[i] : 255;
       if(age <= CFG.hit.stuckFrames){
         mask[i] = isColor ? 2 : 1;
@@ -1545,6 +1547,7 @@ function processFrame(now){
     bgR[i]    = bgR[i] + (r - bgR[i]) * a;
   }
   dbg.hot = nHot; dbg.col = nCol; dbg.dom = topDom;
+  if(nHot >= dbgPk.hot || now - dbgPk.at > 2500){ dbgPk = { hot:nHot, col:nCol, dom:topDom, rgb:pkRGB, at:now }; }
 
   updateArm(now);
 
@@ -3067,7 +3070,7 @@ function renderDiag(){
     ["계산 해상도", $("statRoi").textContent],
     ["배경 밝기 / 노출보정", (bgMeanCache ? bgMeanCache.toFixed(0) : "–") + " / " + gShift.toFixed(1)],
     ["검출 후보", String(lastCand) + (lastCand ? "" : ' <span class="warn">없음</span>')],
-    ["변한 픽셀 (밝음/붉음)", dbg.hot + " / " + dbg.col + "  · 최대 붉음 " + Math.round(dbg.dom)],
+    ["변한 픽셀 (밝음/붉음)", dbgPk.hot + " / " + dbgPk.col + "  · 최대 붉음 " + Math.round(dbgPk.dom) + "<br>점 중심 색(R,G,B) " + dbgPk.rgb],
     ["RELOAD 영역", resetZone ? (zoneOpt.on ? yn(true, "켜짐", "") : '<span class="warn">있지만 꺼짐</span>') : yn(false, "", "없음")],
     ["RELOAD 반응", String(zoneHot) + " px" + (reloadPending ? ' <span class="ok">1/2 확인 대기</span>' : "")],
     ["RELOAD 판정", zoneWhy || "–"],
