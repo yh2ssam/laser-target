@@ -637,13 +637,13 @@ body.kiosk-on{overflow:hidden}
 <script>
 "use strict";
 /* =========================================================================
-   레이저 사격 타겟 v2 — 브라우저 단독 실행 + 구글 시트 기록 (접속 암호 없음)
+   레이저 사격 타겟 v2.1 — 브라우저 단독 실행 + 구글 시트 기록 (접속 암호 없음)
    ========================================================================= */
-const APP_VER = "2.0";
+const APP_VER = "2.1";
 
 /* 구글 시트 웹 앱 주소 (처음 여는 기기에 자동으로 채워진다) */
 const DEFAULT_SHEET = {
-  url: "https://script.google.com/macros/s/AKfycbxwz7he2eWVaDKJYlEG4ij9dbwUS7RijybiFLgQ3jQi5NTuSA2OnQ9_NSUXLyk5u76I/exec"
+  url: "https://script.google.com/macros/s/AKfycbw6_lNSdQTlSWVNEtRNRMVZb9hPAToyxVUe8qMI6CtUDd-IrKQESRDnA7rDSBD2vOmMcQ/exec"
 };
 
 /* ---------- 상수 ---------- */
@@ -721,6 +721,7 @@ let lastProcAt = 0, vfcOn = false;
 let zoneHot = 0, zoneShape = "", zoneUp = 0, zoneDom = 0, zoneWhy = "";
 let reloadPending = false, reloadPendingAt = 0;
 let lastCleared = null, lastSavedSig = "";
+let dbg = { hot:0, col:0, dom:0 };      // 진단용: 변한 픽셀 중 밝은 것 / 붉은 것 / 최대 붉음
 const evlog = [];
 function logEv(t){ evlog.unshift(new Date().toTimeString().slice(0,8) + " " + t); if(evlog.length > 6) evlog.pop(); }
 
@@ -1464,9 +1465,13 @@ async function applyZoom(v, silent){
 /* =========================================================================
    5. 검출 — 새 프레임당 1회, 노출 보정, 연속 프레임 확인, 서브픽셀 중심
    ========================================================================= */
+let lastProcCT = -1;
 function processFrame(now){
   if(!pctx || !video.videoWidth || !roi || video.readyState < 2) return;
   now = now || performance.now();
+  const ct = video.currentTime;
+  if(ct === lastProcCT && now - lastProcAt < 400) return;   // 같은 프레임 중복 처리 방지
+  lastProcCT = ct;
   lastProcAt = now;
   pctx.drawImage(video, roi.x, roi.y, roi.w, roi.h, 0, 0, PW, PH);
   let img;
@@ -1494,7 +1499,6 @@ function processFrame(now){
     bgMeanCache = sg / cnt; bgRMeanCache = sr / cnt;
   }
   const brightT = Math.min(Math.max(bgMeanCache + tune.bright, 110), 250);
-  const redT    = Math.min(Math.max(bgRMeanCache + 40, 70), 205);
   const diffT = tune.diff, redDom = tune.red, mode = tune.color;
 
   /* ① 노출·조명 보정 — 화면 전체가 같이 밝아지거나 어두워진 만큼은 변화로 치지 않는다 */
@@ -1507,7 +1511,7 @@ function processFrame(now){
   gShift = sc ? Math.max(-30, Math.min(30, ss / sc)) : 0;
 
   /* ② 후보 마스크 + 배경 갱신 + 정체(반사·반점) 픽셀 제거 */
-  let changed = 0;
+  let changed = 0, nHot = 0, nCol = 0, topDom = 0;
   mask.fill(0);
   for(let i=0, p=0; i<n; i++, p+=4){
     const r = d[p], g = d[p+1], b = d[p+2];
@@ -1517,13 +1521,17 @@ function processFrame(now){
     const adiff = diff > 0 ? diff : -diff;
     if(adiff > diffT) changed++;
     const isBright = gray > brightT;
+    const rUp = r - bgR[i];                 // 배경 대비 빨강이 얼마나 늘었나
     let dom = 0, isColor = false;
-    if(mode === "red"){ dom = r - (g > b ? g : b); isColor = dom > redDom && r > redT; }
-    else if(mode === "green"){ dom = g - (r > b ? r : b); isColor = dom > redDom && g > redT; }
+    if(mode === "red"){ dom = r - (g > b ? g : b); isColor = dom > redDom && r > 110 && rUp > 25; }
+    else if(mode === "green"){ dom = g - (r > b ? r : b); isColor = dom > redDom && g > 110; }
     else isColor = isBright;
     const hot = isBright || isColor;
+    const inQuad = !quadMask || quadMask[i];
+    if(!warming && adiff > diffT && inQuad && dom > topDom) topDom = dom;
     let a = hot ? BG_ALPHA * SLOW_RATIO : BG_ALPHA;
-    if(!warming && adiff > diffT && hot && (!quadMask || quadMask[i])){
+    if(!warming && adiff > diffT && hot && inQuad){
+      nHot++; if(isColor) nCol++;
       const age = hotAge[i] < 255 ? ++hotAge[i] : 255;
       if(age <= CFG.hit.stuckFrames){
         mask[i] = isColor ? 2 : 1;
@@ -1536,6 +1544,7 @@ function processFrame(now){
     bgGray[i] = bg + (gray - bg) * a;
     bgR[i]    = bgR[i] + (r - bgR[i]) * a;
   }
+  dbg.hot = nHot; dbg.col = nCol; dbg.dom = topDom;
 
   updateArm(now);
 
@@ -2878,6 +2887,9 @@ function maybeRedetect(){
 let rafId = 0, dwellWasOn = false, dwellLastRatio = 0, armTick = 0;
 function startLoop(){
   if(rafId) return;
+  /* 프레임 알림이 되는 브라우저에서는 새 프레임마다 처리한다.
+     과녁 그림이 영상을 가려도 계속 처리되도록, 아래 tick 에서도 항상 시도한다
+     (같은 프레임은 processFrame 안에서 걸러진다). */
   if("requestVideoFrameCallback" in HTMLVideoElement.prototype){
     vfcOn = true;
     const vf = () => {
@@ -2886,17 +2898,10 @@ function startLoop(){
     };
     video.requestVideoFrameCallback(vf);
   }
-  let lastTime = -1;
   const tick = () => {
     rafId = requestAnimationFrame(tick);
     const now = performance.now();
-    if(stream && video.readyState >= 2){
-      if(!vfcOn){
-        if(video.currentTime !== lastTime){ lastTime = video.currentTime; processFrame(now); }
-      }else if(now - lastProcAt > 500){
-        processFrame(now);
-      }
-    }
+    if(stream && video.readyState >= 2) processFrame(now);
     maybeRedetect();
     if(reloadPending){
       const rem = 1 - (now - reloadPendingAt) / CFG.zone.doubleWindowMs;
@@ -3062,6 +3067,7 @@ function renderDiag(){
     ["계산 해상도", $("statRoi").textContent],
     ["배경 밝기 / 노출보정", (bgMeanCache ? bgMeanCache.toFixed(0) : "–") + " / " + gShift.toFixed(1)],
     ["검출 후보", String(lastCand) + (lastCand ? "" : ' <span class="warn">없음</span>')],
+    ["변한 픽셀 (밝음/붉음)", dbg.hot + " / " + dbg.col + "  · 최대 붉음 " + Math.round(dbg.dom)],
     ["RELOAD 영역", resetZone ? (zoneOpt.on ? yn(true, "켜짐", "") : '<span class="warn">있지만 꺼짐</span>') : yn(false, "", "없음")],
     ["RELOAD 반응", String(zoneHot) + " px" + (reloadPending ? ' <span class="ok">1/2 확인 대기</span>' : "")],
     ["RELOAD 판정", zoneWhy || "–"],
