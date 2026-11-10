@@ -660,7 +660,7 @@ const MIN_AREA = 2, MIN_FILL = 0.42, MAX_ASPECT = 2.6;
 const DEFAULTS = { diff:18, bright:45, red:30, color:"red", maxArea:700 };
 /* 검출 튜닝값 — 현장에서 이 값들로 조정한다 */
 const CFG = {
-  hit:  { confirmFrames:2, strongDom:70, stuckFrames:40, cooldownMs:350, coreMin:220, coreUp:35 },
+  hit:  { confirmFrames:2, strongDom:40, stuckFrames:40, cooldownMs:350, coreMin:220, coreUp:35 },
   zone: { strongDom:65, minColorPx:2, stuckMs:2500, doubleWindowMs:1800, confirmMidRun:true },
   det:  { deadbandPx:1.5, softMovePx:6 }
 };
