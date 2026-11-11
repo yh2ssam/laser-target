@@ -66,8 +66,8 @@ button{cursor:pointer}
 .brand{display:flex; align-items:baseline; gap:9px; min-width:0}
 .brand h1{margin:0; font-size:16px; font-weight:600; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .brand .lane{font-family:var(--mono); font-size:11px; color:var(--dim); border:1px solid var(--line); border-radius:3px; padding:1px 6px; white-space:nowrap}
-.brand select.lane{width:auto; padding:2px 8px; background:var(--surface-2); color:var(--text); font-size:12px}
-.brand select.lane:disabled{opacity:.55}
+.brand select.lane{width:auto; padding:2px 6px; background:var(--surface-2); color:var(--text); border:1px solid var(--line); border-radius:4px}
+.brand select.lane:disabled{opacity:.6}
 .camstate{margin-left:auto; display:flex; align-items:center; gap:6px; font-size:12px; color:var(--dim); font-family:var(--mono); white-space:nowrap}
 .dot{width:7px; height:7px; border-radius:50%; background:var(--faint); flex:none}
 .dot.on{background:var(--good)} .dot.warm{background:var(--warn)} .dot.err{background:var(--crit)}
@@ -312,6 +312,7 @@ body.kiosk-on{overflow:hidden}
 .k-setup{position:absolute; left:50%; bottom:16px; transform:translateX(-50%); z-index:9; display:flex; gap:8px; align-items:center; padding:8px 10px; background:var(--surface); border:1px solid var(--line); border-radius:9px; box-shadow:var(--shadow); max-width:calc(100% - 24px)}
 .k-setup input{width:150px; padding:9px 10px}
 .k-setup select{width:auto; padding:9px 8px}
+.k-setup select:disabled{opacity:.6}
 @media (max-width:900px){ .kiosk{grid-template-columns:1fr 220px} .k-stat .v{font-size:24px} .k-stat .v.total{font-size:32px} }
 @media (orientation:portrait){ .kiosk{grid-template-columns:1fr; grid-template-rows:1fr auto} .kiosk-right{border-left:none; border-top:1px solid var(--line); max-height:42vh} }
 </style>
@@ -321,7 +322,7 @@ body.kiosk-on{overflow:hidden}
   <div class="topbar">
     <div class="brand">
       <h1>레이저 사격 타겟</h1>
-      <select class="lane" id="laneSelect" aria-label="사로 선택"></select>
+      <select class="lane" id="laneTag" aria-label="사로 선택"></select>
     </div>
     <span class="camstate"><span class="dot" id="camDot"></span><span id="camText">카메라 꺼짐</span></span>
     <button class="icon-btn" id="diagBtn" title="진단">◈</button>
@@ -363,6 +364,7 @@ body.kiosk-on{overflow:hidden}
         <button role="tab" aria-selected="false" data-tab="calib">보정</button>
         <button role="tab" aria-selected="false" data-tab="records">기록</button>
       </div>
+
       <!-- ================= 사격 ================= -->
       <section class="panel" id="panel-shoot">
         <div class="block">
@@ -422,6 +424,7 @@ body.kiosk-on{overflow:hidden}
           </ul>
         </div>
       </section>
+
       <!-- ================= 보정 ================= -->
       <section class="panel" id="panel-calib" hidden>
         <div class="block">
@@ -456,7 +459,7 @@ body.kiosk-on{overflow:hidden}
         </div>
         <div class="block">
           <h2>1-2단계 · 레이저 RELOAD 영역 <span class="note">태블릿을 만지지 않기 위한 것</span></h2>
-          <p class="hint" style="margin-top:0">과녁 <b>옆에 속이 꽉 찬 검은 사각형</b>(검은 종이 등)을 붙여두면 자동으로 찾습니다. 그 종이를 레이저로 쏘면 화면을 건드리지 않고 초기화되고, 다음 사수가 바로 쏠 수 있습니다. 초기화되기 전의 기록은 <b>자동으로 저장</b>됩니다. 사격 중에 기록이 있을 때는 <b>두 번</b> 쏴야 초기화됩니다.</p>
+          <p class="hint" style="margin-top:0">과녁 <b>옆에 속이 꽉 찬 검은 사각형</b>(검은 종이 등)을 붙여두면 자동으로 찾습니다. 그 종이를 레이저로 쏘면 화면을 건드리지 않고 초기화되고, 다음 사수가 바로 쏠 수 있습니다. 사격 중에 기록이 있을 때는 <b>두 번</b> 쏴야 초기화됩니다. 초기화될 때 기록은 <b>자동으로 저장</b>됩니다.</p>
           <label class="chk" style="margin-top:8px"><input type="checkbox" id="zoneOn">RELOAD 영역 사용</label>
           <div class="row" style="margin-top:8px">
             <button class="btn sm" id="zoneAutoFind" style="flex:1 1 100%">검은 사각형 자동 찾기</button>
@@ -550,6 +553,7 @@ body.kiosk-on{overflow:hidden}
           <div class="msg info" id="detailMsg"></div>
         </div>
       </section>
+
       <!-- ================= 기록 ================= -->
       <section class="panel" id="panel-records" hidden>
         <div class="block">
@@ -593,12 +597,15 @@ body.kiosk-on{overflow:hidden}
     </div>
   </div>
 </div>
+
 <div class="diag" id="diagPanel" hidden>
   <div class="diag-head">진단 <button id="diagClose">✕</button></div>
   <table id="diagTable"></table>
   <div class="diag-live"><span class="diag-dot" id="diagDot"></span><span id="diagLive">레이저 감지 대기</span></div>
 </div>
+
 <div class="countdown" id="countdown" hidden><span id="countdownText">3</span></div>
+
 <!-- 전체화면 사격 모드 -->
 <div class="kiosk" id="kiosk">
   <div class="kiosk-left" id="kioskLeft">
@@ -632,11 +639,12 @@ body.kiosk-on{overflow:hidden}
     </div>
   </div>
 </div>
+
 <script>
 "use strict";
 /* =========================================================================
    레이저 사격 타겟 v2.3 — 브라우저 단독 실행 + 구글 시트 기록 (접속 암호 없음)
-   v2.3: 사로 1~11 선택, 기록 자동 저장(RELOAD·새 사격·새로고침 복구)
+   v2.3: 사로 1~11 선택 · 자동 저장(완료/RELOAD/시작/새로고침 복구)
    ========================================================================= */
 const APP_VER = "2.3";
 /* 구글 시트 웹 앱 주소 (처음 여는 기기에 자동으로 채워진다)
@@ -644,6 +652,7 @@ const APP_VER = "2.3";
 const DEFAULT_SHEET = {
   url: "https://script.google.com/macros/s/AKfycbw6_lNSdQTlSWVNEtRNRMVZb9hPAToyxVUe8qMI6CtUDd-IrKQESRDnA7rDSBD2vOmMcQ/exec"
 };
+
 /* ---------- 상수 ---------- */
 const TARGET_SIZE = 1000, MARGIN = 3, NUM_RINGS = 10, BLACK_FROM = 7;
 const CENTER = TARGET_SIZE / 2;
@@ -657,12 +666,14 @@ const MAX_CHANGED = 0.05;    // 화면 전체가 이만큼 변하면 손 가림/
 const SETTLE_MS = 400;
 const MIN_AREA = 2, MIN_FILL = 0.42, MAX_ASPECT = 2.6;
 const DEFAULTS = { diff:18, bright:45, red:30, color:"red", maxArea:700 };
+
 /* 검출 튜닝값 — 현장에서 이 값들로 조정한다 */
 const CFG = {
   hit:  { confirmFrames:2, strongDom:40, stuckFrames:40, cooldownMs:350, coreMin:220, coreUp:35 },
   zone: { strongDom:65, minColorPx:2, stuckMs:2500, doubleWindowMs:1800, confirmMidRun:true },
   det:  { deadbandPx:1.5, softMovePx:6 }
 };
+
 /* 인쇄물 네 모서리 검은 마커 중심을 과녁 좌표계(0~1000)로 환산한 값 */
 const MARKER_TARGET = [[54.36,61.90],[931.04,61.90],[931.04,938.34],[54.36,938.34]];
 const FULL_TARGET = [[0,0],[TARGET_SIZE,0],[TARGET_SIZE,TARGET_SIZE],[0,TARGET_SIZE]];
@@ -670,18 +681,89 @@ const DET_W = 960;
 const DETECT_BUDGET_MS = 300;   // 마커 탐색이 화면을 막는 최대 시간
 const REDETECT_MS = 6000;
 const ZONE_W = 176, ZONE_WARM = 700;
+
 const LS = {
   corners:"ltw.corners", offset:"ltw.offset", tune:"ltw.tune", lane:"ltw.lane",
   records:"ltw.records", theme:"ltw.theme", camId:"ltw.camId", zone:"ltw.zone",
   zoneOpt:"ltw.zoneOpt", cornerTargets:"ltw.ctgt", autoTrack:"ltw.autoTrack",
-  zoneT:"ltw.zoneT", sheet:"ltw.sheet", lastCleared:"ltw.lastCleared", res:"ltw.res", draft:"ltw.draft"
+  zoneT:"ltw.zoneT", sheet:"ltw.sheet", lastCleared:"ltw.lastCleared", res:"ltw.res"
 };
+
+/* ---------- 사로 · 자동저장 ---------- */
+const LANE_COUNT = 11;
+const UNNAMED = "미입력";
+const DRAFT_KEY = "ltw.draft";
+const laneLabel = (n) => "사로 " + n;
+function normLane(v){                       // 예전 "레인 3" 같은 값도 "사로 3"으로 바꾼다
+  const m = /(\d+)/.exec(String(v || ""));
+  const n = m ? parseInt(m[1], 10) : 1;
+  return laneLabel(n >= 1 && n <= LANE_COUNT ? n : 1);
+}
+function curLane(){ return normLane($("laneTag").value); }
+function fillLaneSelects(){
+  const opts = Array.from({ length:LANE_COUNT }, (v, i) =>
+    '<option value="' + laneLabel(i+1) + '">' + laneLabel(i+1) + '</option>').join("");
+  $("laneTag").innerHTML = opts; $("kLane").innerHTML = opts;
+}
+function setLane(v){
+  const l = normLane(v);
+  $("laneTag").value = l; $("kLane").value = l;
+  try{ localStorage.setItem(LS.lane, l); }catch(e){}
+}
+const hitsSig = () => hits.map(h => h.ts || h.time).join("|");
+/* 사격 중이거나, 아직 저장되지 않은 기록이 있으면 사로를 못 바꾼다 (기록이 다른 사로로 섞이는 것 방지) */
+function updateLaneLock(){
+  const unsaved = hits.length > 0 && hitsSig() !== lastSavedHsig;
+  const lock = session.running || counting || unsaved;
+  $("laneTag").disabled = lock; $("kLane").disabled = lock;
+  $("laneTag").title = lock ? "사격 중이거나 저장 전 기록이 있으면 바꿀 수 없습니다. 저장·초기화 후 바꾸세요." : "";
+}
+/* 새로고침 대비: 한 발마다 임시 보관 */
+function saveDraft(){
+  try{
+    if(!hits.length){ localStorage.removeItem(DRAFT_KEY); return; }
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      name: hitsOwner || $("shooterName").value.trim(), lane: curLane(), hits,
+      startedAt: session.startedAt, limitShots: session.limitShots, limitSec: session.limitSec
+    }));
+  }catch(e){}
+}
+function recoverDraft(){
+  let d = null;
+  try{ d = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); }catch(e){}
+  if(!d || !Array.isArray(d.hits) || !d.hits.length) return;
+  const first = d.hits[0].ts;
+  /* 이미 저장된 기록이면 복구하지 않는다 */
+  if(records.some(r => r.hits && r.hits.length >= d.hits.length && r.hits[0] && r.hits[0].ts === first)){
+    try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
+    return;
+  }
+  hits = d.hits;
+  hitsOwner = d.name || "";
+  if(d.name) $("shooterName").value = d.name;
+  setLane(d.lane);
+  session.startedAt = d.startedAt || 0;
+  session.endedAt = d.hits[d.hits.length - 1].ts || Date.now();
+  session.limitShots = d.limitShots || session.limitShots;
+  session.limitSec = d.limitSec || 0;
+  renderShots(); drawTarget(); updateScorebar();
+  const n = hits.length;
+  saveSession("새로고침 복구 (" + n + "/" + session.limitShots + "발)", true);
+  setMsg("sessionMsg", "새로고침 전의 기록 " + n + "발을 복구해서 저장했습니다.", "");
+}
+const progressTag = () => hits.length + "/" + (session.limitShots || hits.length) + "발";
+function autoSaveHits(reason){
+  if(!hits.length) return false;
+  return saveSession(reason, true);
+}
+
 /* ---------- DOM ---------- */
 const $ = (id) => document.getElementById(id);
 const stage = $("stage"), video = $("video"), overlay = $("overlay");
 const targetCanvas = $("targetCanvas");
 const octx = overlay.getContext("2d");
 const tctx = targetCanvas.getContext("2d");
+
 /* ---------- 상태 ---------- */
 let stream = null, track = null;
 let corners = null, cornerTargets = FULL_TARGET;
@@ -692,7 +774,7 @@ let tune = { ...DEFAULTS };
 let zoneOpt = { on:false, dwell:0, autoSave:false, sens:6, autoArm:true };
 let calibMode = false, calibPts = [];
 let hits = [];
-let session = { running:false, paused:false, endAt:0, remain:0, limitSec:0, limitShots:10, startedAt:0, endedAt:0, endReason:"", id:"", name:"", lane:"" };
+let session = { running:false, paused:false, endAt:0, remain:0, limitSec:0, limitShots:10, startedAt:0, endedAt:0, endReason:"" };
 let records = [];
 let lastHitAt = 0, lastBigChange = 0;
 let audioCtx = null;
@@ -706,6 +788,7 @@ let wakeLock = null;
 let dragPt = null;
 let showMaskOn = false;
 let resNote = "";
+
 /* 검출 버퍼 */
 let procCanvas = null, pctx = null, PW = 0, PH = 0, roi = null;
 let maskCanvas = null, mctx = null;
@@ -718,11 +801,12 @@ let fpsCount = 0, fpsAt = 0, fpsVal = 0, lastCand = 0;
 let lastProcAt = 0, vfcOn = false;
 let zoneHot = 0, zoneShape = "", zoneUp = 0, zoneDom = 0, zoneWhy = "";
 let reloadPending = false, reloadPendingAt = 0;
-let lastCleared = null;
+let lastCleared = null, lastSavedSig = "", lastSavedHsig = "", hitsOwner = "";
 let dbg = { hot:0, col:0, dom:0 };      // 진단용: 변한 픽셀 중 밝은 것 / 붉은 것 / 최대 붉음
 let dbgPk = { hot:0, col:0, dom:0, d:0, rgb:"-", at:0 };
 const evlog = [];
 function logEv(t){ evlog.unshift(new Date().toTimeString().slice(0,8) + " " + t); if(evlog.length > 6) evlog.pop(); }
+
 /* 테마 색 캐시 (매 프레임 getComputedStyle 방지) */
 let cssCache = null;
 function themeVars(){
@@ -736,6 +820,7 @@ function themeVars(){
   };
   return cssCache;
 }
+
 /* =========================================================================
    1. 기하 — 호모그래피
    ========================================================================= */
@@ -891,6 +976,7 @@ function buildQuadMask(){
 const inResetZone = (vx, vy) => !!(zoneOpt.on && resetZone &&
   vx >= resetZone.x && vx <= resetZone.x + resetZone.w &&
   vy >= resetZone.y && vy <= resetZone.y + resetZone.h);
+
 /* =========================================================================
    1-b. 과녁 자동 인식 — 네 모서리의 검은 마커
    ========================================================================= */
@@ -980,6 +1066,7 @@ function detectMarkers(){
   if(cands.length < 4) return null;
   cands.sort((a,b) => b.area - a.area);
   cands = cands.slice(0, 60);
+
   /* 네 점을 마커라고 가정하고 과녁 무늬를 되짚어본다 — 안쪽은 검고 바깥 링은 희어야 한다.
      숫자는 가로·세로 축에 있으므로 대각선에서만 샘플링한다. */
   const RM = MAX_RADIUS;
@@ -1016,6 +1103,7 @@ function detectMarkers(){
     if(edgeOK < 7) return -1;
     return (lSum/lN) - (dSum/dN);
   };
+
   let bestQuad = null, bestScore = 0;
   const tried = Object.create(null);
   let budget = 8000;
@@ -1069,6 +1157,7 @@ function detectMarkers(){
   const kk = vw / dw;
   return bestQuad.map(q => [(q[0] + 0.5) * kk, (q[1] + 0.5) * kk]);   // 픽셀 중심 보정
 }
+
 /* 과녁 옆의 "속이 꽉 찬 검은 사각형" 또는 "테두리만 검은 액자"를 찾는다 */
 function detectReloadSquare(){
   if(!detectPoly) return null;
@@ -1211,6 +1300,7 @@ function runAutoDetect(manual){
   }
   return true;
 }
+
 /* =========================================================================
    2. 채점
    ========================================================================= */
@@ -1225,6 +1315,7 @@ function calcScore(tx, ty){
   const score = ring + frac * 0.9;
   return Math.max(0, Math.min(Math.round(score * 10) / 10, 10.9));
 }
+
 /* =========================================================================
    3. 과녁 그리기
    ========================================================================= */
@@ -1294,6 +1385,7 @@ function drawHitMark(c, x, y, n, faded){
   c.fillText(String(n), lx, ly);
   c.restore();
 }
+
 /* =========================================================================
    4. 카메라
    ========================================================================= */
@@ -1511,6 +1603,7 @@ async function applyZoom(v, silent){
     }
   }catch(e){}
 }
+
 /* =========================================================================
    5. 검출 — 새 프레임당 1회, 노출 보정, 연속 프레임 확인, 서브픽셀 중심
    ========================================================================= */
@@ -1546,6 +1639,7 @@ function processFrame(now){
   }
   const brightT = Math.min(Math.max(bgMeanCache + tune.bright, 110), 250);
   const diffT = tune.diff, redDom = tune.red, mode = tune.color;
+
   /* ① 노출·조명 보정 — 화면 전체가 같이 밝아지거나 어두워진 만큼은 변화로 치지 않는다 */
   let ss = 0, sc = 0;
   for(let i=0, p=0; i<n; i+=7, p+=28){
@@ -1554,6 +1648,7 @@ function processFrame(now){
     if(df > -40 && df < 40){ ss += df; sc++; }
   }
   gShift = sc ? Math.max(-30, Math.min(30, ss / sc)) : 0;
+
   /* ② 후보 마스크 + 배경 갱신 + 정체(반사·반점) 픽셀 제거 */
   let changed = 0, nHot = 0, nCol = 0, topDom = 0, pkD = 0, pkRGB = "-";
   mask.fill(0);
@@ -1598,16 +1693,19 @@ function processFrame(now){
   if(topDom > dbgPk.dom) dbgPk.dom = topDom;
   if(pkD > dbgPk.d){ dbgPk.d = pkD; dbgPk.rgb = pkRGB; }
   updateArm(now);
+
   /* ③ 화면 전체 변화(손·조명)는 과녁과 RELOAD 양쪽에서 보류 */
   const bigChange = changed / n > MAX_CHANGED;
   if(bigChange) lastBigChange = now;
   const settling = (now - lastBigChange) < SETTLE_MS;
+
   /* ④ RELOAD 감시 */
   const zoneFired = zoneUpdate(now, bigChange || settling);
   if(zoneFired && armed && !counting){ handleReloadPulse(now); return; }
   if(warming){ setCam("warm", "배경 학습 중"); return; }
   if(stream) setCam("on", "인식 중");
   if(bigChange || settling){ lastCand = 0; hitTrack = null; return; }
+
   /* ⑤ 블롭 선택 */
   maxFilter3(mask, mask2, PW, PH);
   const blobs = findBlobs(mask2, PW, PH);
@@ -1731,6 +1829,7 @@ function findBlobs(m, W, Hh){
   }
   return out;
 }
+
 /* =========================================================================
    5-b. RELOAD 영역 감시 — 색 증거 필수, 약한 신호는 2프레임, 과녁 겹침 제외
    ========================================================================= */
@@ -1899,6 +1998,7 @@ function handleReloadPulse(now){
   }
   doLaserReset();
 }
+
 /* =========================================================================
    6. 세션 · 탄착
    ========================================================================= */
@@ -1933,7 +2033,6 @@ function registerHit(tx, ty){
   const score = calcScore(tx, ty);
   const time = new Date().toTimeString().slice(0,8);
   hits.push({ x:tx, y:ty, score, time, ts:Date.now() });
-  saveDraft();                         // 새로고침·꺼짐에 대비해 한 발마다 임시저장
   beep(score);
   renderShots(); drawTarget(); updateScorebar();
   if(hits.length >= session.limitShots) stopSession("발사 수 완료");
@@ -2025,11 +2124,15 @@ function doLaserReset(){
     emptyResets = 0;
   }
   lastResetAt = nowMs;
-  /* 기록이 있으면 startSession 안에서 자동 저장된다 (이름이 없으면 '사로N_미입력') */
-  const had = hits.length >= AUTOSAVE_MIN_SHOTS;
+  /* 기록이 한 발이라도 있으면 무조건 저장한다 (이름이 없으면 '미입력') */
+  let savedName = "";
+  if(hits.length){
+    const label = (hitsOwner || $("shooterName").value.trim() || UNNAMED) + " " + hits.length + "발";
+    if(autoSaveHits("RELOAD 초기화 (" + progressTag() + ")")) savedName = label;
+  }
   dwell.on = false; dwell.ratio = 0; dwell.last = 0;
-  flashBanner(had ? "기록 자동 저장 · 다음 사수" : "RELOAD · 다음 사수");
-  startSession(had ? "이전 기록을 저장했습니다. 곧 다시 시작합니다." : "RELOAD 신호를 받았습니다. 곧 다시 시작합니다.", "RELOAD 초기화");
+  flashBanner(savedName ? savedName + " 저장 · 다음 사수" : "RELOAD · 다음 사수");
+  startSession(savedName ? savedName + " 기록을 저장했습니다. 곧 다시 시작합니다." : "RELOAD 신호를 받았습니다. 곧 다시 시작합니다.");
 }
 let bannerTimer = 0;
 function flashBanner(text){
@@ -2040,15 +2143,15 @@ function flashBanner(text){
   bannerTimer = setTimeout(() => { el.classList.remove("flash"); updateStageView(); }, 2200);
 }
 /* 사격을 새로 시작하는 단 하나의 입구 (시작 버튼, RELOAD 모두 여기로) */
-function startSession(msg, reason){
+function startSession(msg){
   if(!stream){ setMsg("sessionMsg", "먼저 카메라를 켜주세요.", "err"); return false; }
   if(!H){ setMsg("sessionMsg", "먼저 보정 탭에서 과녁을 인식시켜 주세요.", "err"); return false; }
   if(counting) return false;
-  archiveHits(reason || "새 사격 시작");   // 지워지기 전에 먼저 저장한다
-  snapshotHits();                          // 지워지기 전에 복구용으로 보관
+  if(hits.length) autoSaveHits("시작 전 자동저장 (" + progressTag() + ")");   // 저장 안 된 기록이 있으면 먼저 저장
+  snapshotHits();                       // 지워지기 전에 복구용으로 보관
   reloadPending = false; dwell.on = false; dwell.ratio = 0;
   hits = [];
-  clearDraft();
+  hitsOwner = "";
   probe = null;
   clearTimeout(registerHit._t);
   session.running = false; session.paused = false;
@@ -2056,6 +2159,7 @@ function startSession(msg, reason){
   renderShots(); updateScorebar(); drawTarget(); renderKiosk(); drawOverlay();
   setMsg("sessionMsg", msg || "준비하세요…", "info");
   runCountdown(beginSession);
+  updateLaneLock();
   /* 카운트다운 중에도 정지(취소)할 수 있게 한다 */
   $("startBtn").disabled = true; $("stopBtn").disabled = false;
   renderKioskStats();
@@ -2063,15 +2167,13 @@ function startSession(msg, reason){
 }
 function beginSession(){
   armed = true;
-  session.id = newId();
-  session.name = $("shooterName").value.trim();
-  session.lane = laneLabel($("laneSelect").value);
   session.limitShots = parseInt($("shotLimit").value, 10);
   session.limitSec = parseInt($("timeLimit").value, 10);
   session.running = true; session.paused = false;
   session.remain = session.limitSec;
   session.endAt = session.limitSec ? Date.now() + session.limitSec*1000 : 0;
   session.startedAt = Date.now(); session.endedAt = 0; session.endReason = "";
+  hitsOwner = $("shooterName").value.trim();      // 이 사격의 주인 이름을 시작 시점에 고정한다
   keepAwake(true);
   lastHitAt = 0;
   $("startBtn").disabled = true; $("pauseBtn").disabled = false; $("stopBtn").disabled = false;
@@ -2079,6 +2181,7 @@ function beginSession(){
   setMsg("sessionMsg", "진행 중입니다. 발사하세요.", "");
   updateStageView();
   renderShots(); drawTarget(); updateScorebar(); renderKiosk();
+  updateLaneLock();
 }
 function stopSession(reason, manual){
   session.running = false; session.paused = false;
@@ -2093,6 +2196,8 @@ function stopSession(reason, manual){
   setMsg("sessionMsg", (reason || "정지") + " · " + hits.length + "발 / 총점 " + total().toFixed(1)
     + (manual ? " · RELOAD 대기를 껐습니다 (시작을 누르면 다시 켜집니다)" : ""), "");
   updateStageView(); updateScorebar(); renderKiosk(); drawTarget(); renderArmLine();
+  if(!manual && hits.length) autoSaveHits(reason || "정지");   // 10발 완료·시간 종료는 자동 저장
+  updateLaneLock();
 }
 function togglePause(){
   if(!session.running) return;
@@ -2144,13 +2249,13 @@ function renderShots(){
   renderKiosk();
   $("shotEmpty").hidden = hits.length > 0;
   $("liveNote").textContent = hits.length ? "총 " + total().toFixed(1) + "점" : "";
+  saveDraft(); updateLaneLock();        // 새로고침 대비 임시 보관 + 사로 잠금 갱신
 }
 /* ---- 지워진 기록 복구 ---- */
 function snapshotHits(){
   if(!hits.length) return;
   lastCleared = {
-    id: session.id, lane: session.lane,
-    name: session.name || $("shooterName").value.trim(),
+    name: hitsOwner || $("shooterName").value.trim(),
     hits: hits.map(h => ({ ...h })),
     meta: { startedAt:session.startedAt, endedAt:(session.running ? Date.now() : session.endedAt), endReason:session.endReason },
     at: Date.now()
@@ -2172,8 +2277,7 @@ function restoreLastCleared(){
   if(!lc){ setMsg("sessionMsg", "복구할 기록이 없습니다.", "err"); return; }
   if(session.running || counting){ setMsg("sessionMsg", "사격 중에는 복구할 수 없습니다. 먼저 정지하세요.", "err"); return; }
   hits = lc.hits.map(h => ({ ...h }));
-  session.id = lc.id || ""; session.name = lc.name || ""; if(lc.lane) session.lane = lc.lane;
-  saveDraft();
+  hitsOwner = lc.name || "";
   if(lc.name) $("shooterName").value = lc.name;
   if(lc.meta){ session.startedAt = lc.meta.startedAt || 0; session.endedAt = lc.meta.endedAt || 0; session.endReason = lc.meta.endReason || ""; }
   lastCleared = null; probe = null;
@@ -2181,62 +2285,10 @@ function restoreLastCleared(){
   renderShots(); drawTarget(); updateScorebar(); renderKiosk(); renderUndo();
   setMsg("sessionMsg", "지워진 기록을 복구했습니다. 필요하면 '기록 저장'을 누르세요.", "");
 }
+
 /* =========================================================================
-   7. 사로 · 임시저장 · 기록 저장 + 구글 시트 전송
+   7. 기록 저장 + 구글 시트 전송
    ========================================================================= */
-/* ---------- 사로 ---------- */
-const LANE_COUNT = 11;
-const laneLabel = (n) => "사로 " + n;
-function fillLaneSelects(){
-  let html = "";
-  for(let i = 1; i <= LANE_COUNT; i++) html += '<option value="' + i + '">사로 ' + i + '</option>';
-  $("laneSelect").innerHTML = html; $("kLane").innerHTML = html;
-  let n = 1;
-  try{ n = parseInt(String(localStorage.getItem(LS.lane) || "").replace(/\D/g, ""), 10); }catch(e){}
-  if(!(n >= 1 && n <= LANE_COUNT)) n = 1;      // 예전 "레인 3" 같은 값도 숫자만 뽑아 변환
-  setLane(n);
-}
-function setLane(n){
-  $("laneSelect").value = n; $("kLane").value = n;
-  try{ localStorage.setItem(LS.lane, String(n)); }catch(e){}
-}
-function updateLaneLock(){
-  const lock = session.running || counting;
-  $("laneSelect").disabled = lock; $("kLane").disabled = lock;
-}
-/* ---------- 임시저장 (새로고침 대비) ---------- */
-const AUTOSAVE_MIN_SHOTS = 1;      // 이 발수 미만이면 자동 저장하지 않는다 (시험 사격 방지)
-function saveDraft(){
-  try{
-    if(!hits.length){ localStorage.removeItem(LS.draft); return; }
-    localStorage.setItem(LS.draft, JSON.stringify({
-      id: session.id, name: session.name, lane: session.lane,
-      startedAt: session.startedAt, limitShots: session.limitShots, limitSec: session.limitSec,
-      hits: hits.map(h => ({ x:h.x, y:h.y, score:h.score, time:h.time, ts:h.ts })),
-      at: Date.now()
-    }));
-  }catch(e){}
-}
-function clearDraft(){ try{ localStorage.removeItem(LS.draft); }catch(e){} }
-function recoverDraft(){
-  let d = null;
-  try{ d = JSON.parse(localStorage.getItem(LS.draft) || "null"); }catch(e){}
-  if(!d || !Array.isArray(d.hits) || !d.hits.length){ clearDraft(); return; }
-  const id = d.id ? String(d.id) : newId();
-  if(records.some(r => String(r.id) === id)){ clearDraft(); return; }   // 이미 저장됨
-  const lane = d.lane || laneLabel($("laneSelect").value);
-  const name = (d.name || "").trim() || lane.replace(/\s/g, "") + "_미입력";
-  const lim = d.limitShots || 10;
-  records.unshift(makeRecord({
-    id, name, lane, startedAt:d.startedAt, endedAt:d.at || Date.now(),
-    reason: d.hits.length >= lim ? "발사 수 완료(복구)" : "중단(새로고침) " + d.hits.length + "/" + lim + "발",
-    timeLimit:d.limitSec, shotLimit:lim, hits:d.hits
-  }));
-  saveRecords(); clearDraft(); renderRecords();
-  setMsg("saveMsg", "끊겼던 기록(" + name + ", " + d.hits.length + "발)을 자동으로 저장했습니다.", "info");
-  if(sheetCfg.url && sheetCfg.auto) setTimeout(() => syncPending(false), 1500);
-}
-/* ---------- 기록 ---------- */
 const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 function loadRecords(){
   try{ records = JSON.parse(localStorage.getItem(LS.records) || "[]"); }
@@ -2252,61 +2304,53 @@ function sessionMeta(reasonOverride){
   const reason = reasonOverride || (session.running ? "저장(진행 중)" : (session.endReason || ""));
   return { startedAt: session.startedAt || 0, endedAt, reason };
 }
-function makeRecord(o){
-  const hs = o.hits;
-  return {
-    id: o.id, name: o.name, lane: o.lane,
+/* 저장에 성공했거나 이미 저장된 기록이면 true
+   auto=true: 자동 저장 (이름이 없으면 '미입력', 사격 시작 때 고정한 이름 사용, 같은 발 기록은 이름이 달라도 중복 저장 안 함) */
+function saveSession(reasonOverride, auto){
+  let name = (auto && hitsOwner) ? hitsOwner : $("shooterName").value.trim();
+  if(!name){
+    if(!auto){ setMsg("saveMsg", "이름을 입력해주세요.", "err"); $("shooterName").focus(); return false; }
+    name = UNNAMED;
+  }
+  if(!hits.length){ if(!auto) setMsg("saveMsg", "저장할 발사 기록이 없습니다.", "err"); return false; }
+  const hsig = hitsSig();
+  const sig = hsig + "#" + name;
+  if(sig === lastSavedSig || (auto && hsig === lastSavedHsig)){
+    if(!auto) setMsg("saveMsg", "이미 저장한 기록입니다.", "info");
+    return true;
+  }
+  const m = sessionMeta(typeof reasonOverride === "string" ? reasonOverride : "");
+  const rec = {
+    id: newId(),
+    name,
+    lane: curLane(),
     savedAt: new Date().toISOString(),
-    startedAt: o.startedAt ? new Date(o.startedAt).toISOString() : "",
-    durationSec: o.startedAt ? Math.max(0, Math.round((o.endedAt - o.startedAt)/1000)) : 0,
-    endReason: o.reason, timeLimit: o.timeLimit || 0, shotLimit: o.shotLimit || hs.length,
-    total: Math.round(hs.reduce((s,h) => s + h.score, 0) * 10) / 10,
-    hits: hs.map((h,i) => ({ no:i+1, score:h.score, time:h.time, ts:h.ts || 0,
-                             x:Math.round(h.x*10)/10, y:Math.round(h.y*10)/10 })),
+    startedAt: m.startedAt ? new Date(m.startedAt).toISOString() : "",
+    durationSec: m.startedAt ? Math.max(0, Math.round((m.endedAt - m.startedAt)/1000)) : 0,
+    endReason: m.reason,
+    timeLimit: session.limitSec || 0,
+    shotLimit: session.limitShots,
+    total: Math.round(total()*10)/10,
+    hits: hits.map((h,i) => ({ no:i+1, score:h.score, time:h.time, ts:h.ts || 0,
+                               x:Math.round(h.x*10)/10, y:Math.round(h.y*10)/10 })),
     synced: false
   };
-}
-/* "ok" | "dup"(이미 저장됨) | "nostore"(이 기기 저장 공간 부족) */
-function storeRecord(name, reasonOverride){
-  if(!session.id) session.id = newId();     // 같은 기록을 여러 번 눌러도 중복되지 않게 ID를 고정한다
-  const id = session.id;
-  if(records.some(r => String(r.id) === id)) return "dup";
-  const m = sessionMeta(reasonOverride);
-  records.unshift(makeRecord({
-    id, name, lane: session.lane || laneLabel($("laneSelect").value),
-    startedAt:m.startedAt, endedAt:m.endedAt, reason:m.reason,
-    timeLimit:session.limitSec, shotLimit:session.limitShots, hits
-  }));
+  records.unshift(rec);
+  lastSavedSig = sig; lastSavedHsig = hsig;
+  try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}     // 저장됐으니 임시 보관본은 지운다
+  updateLaneLock();
   const stored = saveRecords();
   renderRecords();
-  if(sheetCfg.url && sheetCfg.auto) syncPending(false);
-  return stored ? "ok" : "nostore";
-}
-/* 기록이 지워지기 직전에 부르는 자동 저장. 이름이 없어도 저장한다. */
-function archiveHits(reason){
-  if(hits.length < AUTOSAVE_MIN_SHOTS) return;
-  const lane = session.lane || laneLabel($("laneSelect").value);
-  const name = (session.name || "").trim() || lane.replace(/\s/g, "") + "_미입력";
-  const why = session.running
-    ? reason + " " + hits.length + "/" + session.limitShots + "발"
-    : (session.endReason || reason);
-  const res = storeRecord(name, why);
-  clearDraft();
-  if(res === "nostore") setMsg("saveMsg", "자동 저장이 이 기기에 기록되지 못했습니다(저장 공간 부족). CSV로 내려받으세요.", "err");
-  else if(res === "ok") logEv("자동 저장 " + name + " " + hits.length + "발");
-}
-function saveSession(reasonOverride){
-  const name = $("shooterName").value.trim();
-  if(!name){ setMsg("saveMsg", "이름을 입력해주세요.", "err"); $("shooterName").focus(); return false; }
-  if(!hits.length){ setMsg("saveMsg", "저장할 발사 기록이 없습니다.", "err"); return false; }
-  const res = storeRecord(name, typeof reasonOverride === "string" ? reasonOverride : "");
-  clearDraft();
-  if(res === "dup"){ setMsg("saveMsg", "이미 저장한 기록입니다.", "info"); return true; }
   const willSync = sheetCfg.url && sheetCfg.auto;
-  const base = name + " · " + hits.length + "발 / " + total().toFixed(1) + "점";
-  if(res === "ok") setMsg("saveMsg", base + " 저장했습니다." + (willSync ? " 시트로 보내는 중…" : ""), "");
-  else setMsg("saveMsg", base + " — 이 기기에 저장하지 못했습니다(저장 공간 부족). 오래된 기록을 삭제하거나 CSV로 내려받으세요."
-    + (willSync ? " 시트로는 보내는 중…" : ""), "err");
+  if(stored){
+    setMsg("saveMsg", name + " · " + hits.length + "발 / " + total().toFixed(1) + "점 저장했습니다."
+      + (willSync ? " 시트로 보내는 중…" : ""), "");
+  }else{
+    setMsg("saveMsg", name + " · " + hits.length + "발 / " + total().toFixed(1)
+      + "점 — 이 기기에 저장하지 못했습니다(저장 공간 부족). 오래된 기록을 삭제하거나 CSV로 내려받으세요."
+      + (willSync ? " 시트로는 보내는 중…" : ""), "err");
+  }
+  if(willSync) syncPending(false);
   return true;
 }
 function renderRecords(){
@@ -2370,6 +2414,7 @@ function exportCsv(){
     setMsg("recMsg", "내려받지 못했습니다.", "err");
   }
 }
+
 /* ---- 구글 시트 (접속 암호 없음) ---- */
 let sheetCfg = { url:"", auto:true, sheetUrl:"" };
 let syncing = false;
@@ -2502,6 +2547,7 @@ async function syncPending(manual){
   else if(ok) setMsg("sheetMsg", ok + "건을 시트에 보냈습니다." + (stored ? "" : " (이 기기에 상태를 저장하지 못했습니다)"), stored ? "" : "err");
   if(ok && !fail) setMsg("saveMsg", $("saveMsg").textContent.replace(" 시트로 보내는 중…", " 시트에도 기록했습니다."), "");
 }
+
 /* =========================================================================
    8. 보정 UI
    ========================================================================= */
@@ -2758,6 +2804,7 @@ function nudge(dir){
   try{ localStorage.setItem(LS.offset, JSON.stringify(offset)); }catch(e){}
   $("offsetMsg").textContent = "보정값 X " + Math.round(offset.x) + " / Y " + Math.round(offset.y);
 }
+
 /* =========================================================================
    9. 화면 갱신
    ========================================================================= */
@@ -2790,6 +2837,7 @@ function updateStageView(){
   else hint.hidden = true;
   stage.style.cursor = (calibMode || zoneMode) ? "crosshair" : "default";
 }
+
 /* 9-a. 확대 */
 const view = { z:1, cx:0, cy:0 };
 const VIEW_ZMAX = 6;
@@ -3086,7 +3134,7 @@ function startLoop(){
     }
     if(diagOn && ++diagTick % 12 === 0) renderDiag();
     if(fullCam) renderZoneVal();
-    if(++armTick % 15 === 0){ renderArmLine(); updateLaneLock(); }
+    if(++armTick % 15 === 0) renderArmLine();
     $("statFps").textContent = fpsVal ? fpsVal.toFixed(0) : "–";
     $("statBg").textContent = bgMeanCache ? bgMeanCache.toFixed(0) : "–";
     $("statCand").textContent = String(lastCand);
@@ -3263,6 +3311,7 @@ function renderDiag(){
   else if(lastCand > 0){ dot.className = "diag-dot hit"; live.textContent = "지금 후보 " + lastCand + "개가 보입니다"; }
   else{ dot.className = "diag-dot"; live.textContent = stream ? "레이저 감지 대기" : "카메라가 꺼져 있습니다"; }
 }
+
 /* =========================================================================
    10. 소리
    ========================================================================= */
@@ -3292,6 +3341,7 @@ function beep(score){
   };
   evs.forEach(e => document.addEventListener(e, onFirst, true));
 })();
+
 /* =========================================================================
    11. 초기화 · 이벤트
    ========================================================================= */
@@ -3317,6 +3367,7 @@ function loadSettings(){
     if(o && typeof o.x === "number") offset = o;
     const t = JSON.parse(localStorage.getItem(LS.tune) || "null");
     if(t) tune = { ...DEFAULTS, ...t };
+    setLane(localStorage.getItem(LS.lane));
     const th = localStorage.getItem(LS.theme);
     if(th) document.documentElement.setAttribute("data-theme", th);
     const z = JSON.parse(localStorage.getItem(LS.zone) || "null");
@@ -3387,12 +3438,6 @@ function bind(){
       document.querySelector('.tabs button[data-tab="shoot"]').click();
     }else exitKiosk();
   });
-  /* 사로 선택 (상단 · 전체화면 공용) */
-  $("laneSelect").addEventListener("change", e => setLane(+e.target.value));
-  $("kLane").addEventListener("change", e => setLane(+e.target.value));
-  $("shooterName").addEventListener("input", e => {
-    if(session.running){ session.name = e.target.value.trim(); saveDraft(); }   // 사격 중에 이름을 고치면 기록에도 반영
-  });
   $("kName").addEventListener("input", e => { $("shooterName").value = e.target.value; renderKioskStats(); });
   $("kStart").addEventListener("click", () => { $("shooterName").value = $("kName").value; startSession(); });
   $("kStop").addEventListener("click", () => stopSession("수동 정지", true));
@@ -3421,13 +3466,14 @@ function bind(){
     cancelCountdown();               // 카운트다운 중에 눌러도 그대로 사격이 시작되지 않도록
     snapshotHits();
     reloadPending = false;
-    hits = []; holdArm(1500); session.running = false;
-    clearDraft();                    // 직접 비운 기록은 새로고침 복구 대상에서 뺀다
+    hits = []; hitsOwner = ""; holdArm(1500); session.running = false;
     $("startBtn").disabled = false; $("pauseBtn").disabled = true; $("stopBtn").disabled = true;
     renderShots(); drawTarget(); updateScorebar(); renderKiosk();
     setMsg("saveMsg", "화면을 비웠습니다. (실수였다면 '지운 기록 복구')", "info");
   });
   $("undoBtn").addEventListener("click", restoreLastCleared);
+  $("laneTag").addEventListener("change", e => setLane(e.target.value));
+  $("kLane").addEventListener("change", e => setLane(e.target.value));
   $("fullCalibBtn").addEventListener("click", () => {
     if(!stream){ setMsg("calibMsg", "먼저 카메라를 켜주세요.", "err"); return; }
     calibMode = false; zoneMode = false; calibPts = []; zonePts = [];
@@ -3616,13 +3662,15 @@ function selfTest(){
   t("안쪽이 더 높다", calcScore(500, 540) > calcScore(500, 580));
   console.log(out.join("\n"));
 }
+
 /* ---------- 시작 ---------- */
+fillLaneSelects();      // 사로 선택창을 먼저 채운다 (loadSettings 가 값을 넣기 전에)
 loadSettings();
 loadSheetCfg();
 fillSelects();
-fillLaneSelects();
 syncTuneUI();
 loadRecords();
+recoverDraft();         // 새로고침 직전의 기록 복구 (첫 renderShots 보다 먼저)
 bind();
 fillSheetUI();
 drawTarget();
@@ -3632,7 +3680,6 @@ updateScorebar();
 updateStageView();
 renderArmLine();
 renderUndo();
-recoverDraft();
 $("offsetMsg").textContent = "보정값 X " + Math.round(offset.x) + " / Y " + Math.round(offset.y);
 startLoop();
 autoStartIfAllowed();
