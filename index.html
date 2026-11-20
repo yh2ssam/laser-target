@@ -643,10 +643,11 @@ body.kiosk-on{overflow:hidden}
 <script>
 "use strict";
 /* =========================================================================
-   레이저 사격 타겟 v2.3 — 브라우저 단독 실행 + 구글 시트 기록 (접속 암호 없음)
+   레이저 사격 타겟 v2.4 — 브라우저 단독 실행 + 구글 시트 기록 (접속 암호 없음)
    v2.3: 사로 1~11 선택 · 자동 저장(완료/RELOAD/시작/새로고침 복구)
+   v2.4: 쏘지 않은 발은 0점으로 채워 저장 · 수동 정지도 자동 저장 · 시트 전송 실패 문구 표시
    ========================================================================= */
-const APP_VER = "2.3";
+const APP_VER = "2.4";
 /* 구글 시트 웹 앱 주소 (처음 여는 기기에 자동으로 채워진다)
    접속 암호가 없으므로 이 주소가 유출되면 누구나 기록을 보낼 수 있다. 유출됐다면 새로 배포해서 바꾼다. */
 const DEFAULT_SHEET = {
@@ -2196,7 +2197,7 @@ function stopSession(reason, manual){
   setMsg("sessionMsg", (reason || "정지") + " · " + hits.length + "발 / 총점 " + total().toFixed(1)
     + (manual ? " · RELOAD 대기를 껐습니다 (시작을 누르면 다시 켜집니다)" : ""), "");
   updateStageView(); updateScorebar(); renderKiosk(); drawTarget(); renderArmLine();
-  if(!manual && hits.length) autoSaveHits(reason || "정지");   // 10발 완료·시간 종료는 자동 저장
+  if(hits.length) autoSaveHits(reason || "정지");              // 완료·시간 종료·수동 정지 모두 저장
   updateLaneLock();
 }
 function togglePause(){
@@ -2305,7 +2306,8 @@ function sessionMeta(reasonOverride){
   return { startedAt: session.startedAt || 0, endedAt, reason };
 }
 /* 저장에 성공했거나 이미 저장된 기록이면 true
-   auto=true: 자동 저장 (이름이 없으면 '미입력', 사격 시작 때 고정한 이름 사용, 같은 발 기록은 이름이 달라도 중복 저장 안 함) */
+   auto=true: 자동 저장 (이름이 없으면 '미입력', 사격 시작 때 고정한 이름 사용, 같은 발 기록은 이름이 달라도 중복 저장 안 함)
+   쏘지 않은 발은 0점으로 채워 저장한다 (자동 저장, 또는 사격이 끝난 뒤의 수동 저장) */
 function saveSession(reasonOverride, auto){
   let name = (auto && hitsOwner) ? hitsOwner : $("shooterName").value.trim();
   if(!name){
@@ -2320,6 +2322,13 @@ function saveSession(reasonOverride, auto){
     return true;
   }
   const m = sessionMeta(typeof reasonOverride === "string" ? reasonOverride : "");
+  /* 쏘지 않은 발은 0점으로 채운다 (좌표·시각은 비워 둔다) */
+  const padTo = (auto || !session.running) ? Math.max(hits.length, session.limitShots || 0) : hits.length;
+  const missed = padTo - hits.length;
+  const recHits = hits.map((h,i) => ({ no:i+1, score:h.score, time:h.time, ts:h.ts || 0,
+                                       x:Math.round(h.x*10)/10, y:Math.round(h.y*10)/10 }));
+  for(let i = recHits.length; i < padTo; i++) recHits.push({ no:i+1, score:0, time:"", ts:0, x:"", y:"" });
+  const missedTxt = missed ? " (미발사 " + missed + "발은 0점)" : "";
   const rec = {
     id: newId(),
     name,
@@ -2331,8 +2340,7 @@ function saveSession(reasonOverride, auto){
     timeLimit: session.limitSec || 0,
     shotLimit: session.limitShots,
     total: Math.round(total()*10)/10,
-    hits: hits.map((h,i) => ({ no:i+1, score:h.score, time:h.time, ts:h.ts || 0,
-                               x:Math.round(h.x*10)/10, y:Math.round(h.y*10)/10 })),
+    hits: recHits,
     synced: false
   };
   records.unshift(rec);
@@ -2343,7 +2351,7 @@ function saveSession(reasonOverride, auto){
   renderRecords();
   const willSync = sheetCfg.url && sheetCfg.auto;
   if(stored){
-    setMsg("saveMsg", name + " · " + hits.length + "발 / " + total().toFixed(1) + "점 저장했습니다."
+    setMsg("saveMsg", name + " · " + hits.length + "발 / " + total().toFixed(1) + "점 저장했습니다." + missedTxt
       + (willSync ? " 시트로 보내는 중…" : ""), "");
   }else{
     setMsg("saveMsg", name + " · " + hits.length + "발 / " + total().toFixed(1)
@@ -2543,7 +2551,11 @@ async function syncPending(manual){
   }
   syncing = false;
   const stored = saveRecords(); renderRecords();
-  if(fail) setMsg("sheetMsg", ok + "건 전송, " + (list.length - ok) + "건 대기/오류 — " + lastErr, "err");
+  if(fail){
+    setMsg("sheetMsg", ok + "건 전송, " + (list.length - ok) + "건 대기/오류 — " + lastErr, "err");
+    if($("saveMsg").textContent.indexOf("시트로") >= 0)
+      setMsg("saveMsg", "이 기기에는 저장됐지만 시트 전송에 실패했습니다 — " + lastErr + " (1분마다 다시 보냅니다)", "err");
+  }
   else if(ok) setMsg("sheetMsg", ok + "건을 시트에 보냈습니다." + (stored ? "" : " (이 기기에 상태를 저장하지 못했습니다)"), stored ? "" : "err");
   if(ok && !fail) setMsg("saveMsg", $("saveMsg").textContent.replace(" 시트로 보내는 중…", " 시트에도 기록했습니다."), "");
 }
